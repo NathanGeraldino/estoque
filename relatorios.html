@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatórios | Estoque TI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="relatorios">
+  <div class="app">
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-icon">
+            <img src="img/Perfilclio.jpg" alt="logo">
+          </div>
+          <div>
+            <h2>Estoque TI</h2>
+            <p>Controle de Estoque</p>
+          </div>
+        </div>
+
+        <nav class="menu">
+          <a href="index.html" data-menu="inicio">Dashboard</a>
+          <a href="produtos.html" data-menu="produtos">Equipamentos</a>
+          <a href="movimentacoes.html" data-menu="movimentacoes">Movimentações</a>
+          <a href="relatorios.html" data-menu="relatorios">Relatórios</a>
+          <a href="alocacoes.html" data-menu="alocacoes">Alocações</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <p></p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1>Relatórios</h1>
+          <p>Exporte seus dados e visualize o resumo do estoque.</p>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="btn btn-secondary" id="exportarCsv">Exportar CSV</button>
+          <button class="btn btn-primary" id="imprimirPdf">Salvar em PDF</button>
+        </div>
+      </header>
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Resumo geral dos Equipamentos</h2>
+          <p>Relação completa para conferência e impressão</p>
+        </div>
+        <div id="tabelaRelatorios"></div>
+      </section>
+
+      <section class="panel margin-top">
+        <div class="panel-header">
+          <h2>Estoque por categoria</h2>
+          <p>Quantidade total agrupada por categoria</p>
+        </div>
+        <div id="tabelaCategorias"></div>
+      </section>
+
+      <section class="panel margin-top">
+        <div class="panel-header">
+          <h2>Equipamentos com maior saída</h2>
+          <p>Ranking com base nas movimentações de saída</p>
+        </div>
+        <div id="tabelaMaiorSaida"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

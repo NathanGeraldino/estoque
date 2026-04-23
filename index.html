@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | Estoque TI</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body data-page="dashboard">
+  <div class="app">
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-icon">
+            <img src="img/Perfilclio.jpg" alt="logo">
+          </div>
+          <div>
+            <h2>Estoque TI</h2>
+            <p>Controle de Estoque</p>
+          </div>
+        </div>
+
+        <nav class="menu">
+          <a href="index.html" data-menu="inicio">Dashboard</a>
+          <a href="produtos.html" data-menu="produtos">Equipamentos</a>
+          <a href="movimentacoes.html" data-menu="movimentacoes">Movimentações</a>
+          <a href="relatorios.html" data-menu="relatorios">Relatórios</a>
+          <a href="alocacoes.html" data-menu="alocacoes">Alocações</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <p></p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Visão geral do estoque e das movimentações.</p>
+        </div>
+      </header>
+
+      <section class="stats">
+        <div class="stat-card">
+          <span>Total de Equipamentos</span>
+          <strong id="totalProdutos">0</strong>
+        </div>
+
+        <div class="stat-card">
+          <span>Total em estoque</span>
+          <strong id="totalQuantidade">0</strong>
+        </div>
+
+        <div class="stat-card warning">
+          <span>Estoque baixo</span>
+          <strong id="estoqueBaixo">0</strong>
+        </div>
+
+        <div class="stat-card success">
+          <span>Valor total em estoque</span>
+          <strong id="valorTotalEstoque">R$ 0,00</strong>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Equipamentos com estoque baixo</h2>
+          <p>Itens que precisam de atenção</p>
+        </div>
+        <div id="dashboardLowStock"></div>
+      </section>
+
+      <section class="charts-grid">
+        <div class="panel chart-panel">
+          <div class="panel-header">
+            <h2>Estoque por categoria</h2>
+            <p>Quantidade total agrupada por categoria</p>
+          </div>
+          <div class="chart-box">
+            <canvas id="chartCategorias"></canvas>
+          </div>
+        </div>
+
+        <div class="panel chart-panel">
+          <div class="panel-header">
+            <h2>Equipamentos com maior saída</h2>
+            <p>Top Equipamentos mais movimentados em saída</p>
+          </div>
+          <div class="chart-box">
+            <canvas id="chartSaidas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel margin-top">
+        <div class="panel-header">
+          <h2>Entradas x Saídas</h2>
+          <p>Comparativo geral das movimentações</p>
+        </div>
+        <div class="chart-box chart-box-lg">
+          <canvas id="chartMovimentacoes"></canvas>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

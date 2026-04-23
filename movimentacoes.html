@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movimentações | Estoque TI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="movimentacoes">
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-icon">
+            <img src="img/Perfilclio.jpg" alt="logo">
+          </div>
+          <div>
+            <h2>Estoque TI</h2>
+            <p>Controle de Estoque</p>
+          </div>
+        </div>
+
+        <nav class="menu">
+          <a href="index.html" data-menu="dashboard">Dashboard</a>
+          <a href="produtos.html" data-menu="produtos">Equipamentos</a>
+          <a href="movimentacoes.html" data-menu="movimentacoes">Movimentações</a>
+          <a href="relatorios.html" data-menu="relatorios">Relatórios</a>
+          <a href="alocacoes.html" data-menu="alocacoes">Alocações</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <p></p>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO -->
+    <main class="main">
+
+      <!-- TOPO -->
+      <header class="topbar">
+        <div>
+          <h1>Movimentações</h1>
+          <p>Registre entradas, saídas e acompanhe o histórico do estoque.</p>
+        </div>
+      </header>
+
+      <!-- FORM DE MOVIMENTAÇÃO -->
+      <section class="panel">
+        <div class="panel-header">
+
+          <h2>Movimentar estoque</h2>
+          <p>Selecione o produto e informe a movimentação</p>
+        </div>
+
+        <form id="movimentacaoForm" class="product-form">
+
+          <div class="form-group">
+            <label for="produtoMov">Produto</label>
+            <select id="produtoMov" class="form-select"></select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="tipoMov">Tipo</label>
+              <select id="tipoMov" class="form-select">
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="quantidadeMov">Quantidade</label>
+              <input type="number" id="quantidadeMov" min="1" value="1" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="obsMov">Observação</label>
+            <input type="text" id="obsMov" placeholder="Ex: compra, ajuste, manutenção..." />
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" id="btnSalvarMov">
+              Registrar
+            </button>
+
+            <button type="button" class="btn btn-secondary" id="cancelarEdicaoMov">
+              Cancelar
+            </button>
+
+            <button class="btn btn-secondary" style="margin-left: 1760px;" onclick=" exportarMovimentacoesExcel()">
+              Exportar Movimentações
+            </button>
+
+            <p id="modoEdicaoMov" style="display: none; color: #f59e0b; margin-top: 10px;">
+              ✏️ Você está editando uma movimentação
+            </p>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- FILTROS -->
+      <section class="panel margin-top">
+        <div class="panel-header">
+          <h2>Filtros do histórico</h2>
+          <p>Filtre por período e Equipamentos</p>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="filtroDataInicial">Data inicial</label>
+            <input type="date" id="filtroDataInicial" />
+          </div>
+
+          <div class="form-group">
+            <label for="filtroDataFinal">Data final</label>
+            <input type="date" id="filtroDataFinal" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="filtroProdutoMov">Equipamentos</label>
+            <select id="filtroProdutoMov" class="form-select">
+              <option value="">Todos os Equipamentos</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button type="button" class="btn btn-secondary full-width" id="limparFiltrosMov">
+              Limpar filtros
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- HISTÓRICO -->
+      <section class="panel margin-top">
+        <div class="panel-header">
+          <h2>Histórico de movimentações</h2>
+          <p>Visualize todas as entradas e saídas registradas</p>
+        </div>
+
+        <div id="tabelaMovimentacoes"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

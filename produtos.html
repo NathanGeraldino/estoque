@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Equipamentos | Estoque TI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body data-page="produtos">
+  <div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-icon">
+            <img src="img/Perfilclio.jpg" alt="logo">
+          </div>
+          <div>
+            <h2>Estoque TI</h2>
+            <p>Controle de Estoque</p>
+          </div>
+        </div>
+
+        <nav class="menu">
+          <a href="index.html" data-menu="dashboard">Dashboard</a>
+          <a href="produtos.html" data-menu="produtos">Equipamentos</a>
+          <a href="movimentacoes.html" data-menu="movimentacoes">Movimentações</a>
+          <a href="relatorios.html" data-menu="relatorios">Relatórios</a>
+          <a href="alocacoes.html" data-menu="alocacoes">Alocações</a>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <p></p>
+      </div>
+    </aside>
+
+    <!-- CONTEÚDO -->
+    <main class="main">
+
+      <!-- TOPO -->
+      <header class="topbar">
+        <div>
+          <h1>Equipamentos</h1>
+          <p>Cadastre, edite e gerencie os itens do estoque.</p>
+        </div>
+      </header>
+
+      <!-- GRID -->
+      <section class="content-grid">
+
+        <!-- FORM -->
+        <div class="panel form-panel">
+          <div class="panel-header">
+            <h2 id="formTitle">Cadastrar Equipamentos</h2>
+            <p>Preencha os dados do item</p>
+          </div>
+
+          <form id="produtoForm" class="product-form">
+
+            <div class="form-group">
+              <label for="nome">Nome do Equipamentos</label>
+              <input type="text" id="nome" placeholder="Ex: Notebook Dell, Mouse Logitech..." required />
+            </div>
+
+            <div class="form-group">
+              <label for="modelo">Modelo</label>
+              <input type="text" id="modelo" placeholder="Ex: Dell Latitude 5420" />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="quantidade">Quantidade</label>
+                <input type="number" id="quantidade" min="0" placeholder="0" required />
+              </div>
+
+              <div class="form-group">
+                <label for="minimo">Estoque mínimo</label>
+                <input type="number" id="minimo" min="0" value="5" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="valor">Valor unitário (R$)</label>
+              <input type="number" id="valor" min="0" step="0.01" placeholder="0,00" required />
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="btnSalvarProduto">
+                Salvar
+              </button>
+
+              <button type="button" class="btn btn-secondary" id="cancelarEdicao">
+                Cancelar
+              </button>
+
+              <p id="modoEdicaoProduto" style="display: none; color: #f59e0b; margin-top: 10px;">
+                ✏️ Você está editando um Equipamentos
+              </p>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- TABELA -->
+        <div class="panel table-panel">
+
+          <div class="panel-header table-header">
+            <div>
+              <h2>Equipamentos cadastrados</h2>
+              <p>Busque e acompanhe os itens do estoque</p>
+            </div>
+
+            <input type="text" id="busca" class="search" placeholder="Buscar por nome ou categoria..." />
+          </div>
+
+          <div id="tabelaProdutos"></div>
+
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
