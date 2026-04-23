@@ -1,4 +1,4 @@
-const API_URL = "";
+const API_URL = "http://localhost:3000";
 let produtos = [];
 let movimentacoes = [];
 let alocacoes = [];
