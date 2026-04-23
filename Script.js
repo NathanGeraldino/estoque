@@ -1794,27 +1794,3 @@ function obterValorEspecificacoes(item) {
     ""
   );
 }
-async function init() {
-  atualizarMenuAtivo();
-
-  try {
-    await carregarDados();
-  } catch (error) {
-    console.error(error);
-    produtos = [];
-    movimentacoes = [];
-    alocacoes = [];
-    historicoAlocacoes = [];
-  }
-
-  atualizarCards();
-  renderDashboardLowStock();
-  renderDashboardCharts();
-  renderHomeUltimasMovimentacoes();
-  await initProdutosPage();
-  await initMovimentacoesPage();
-  initAlocacoesPage();
-  initRelatoriosPage();
-}
-
-init();
