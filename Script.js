@@ -900,6 +900,7 @@ function initProdutosPage() {
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
+    console.log("Cliquei em salvar equipamento");
 
     const nome = document.getElementById("nome").value.trim();
     const modelo = document.getElementById("modelo").value.trim();
