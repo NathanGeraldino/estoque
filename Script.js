@@ -56,7 +56,6 @@ async function carregarDados() {
       quantidade: p.quantidade,
       minimo: p.quantidade_minima,
       valor: p.preco,
-      localizacao: p.localizacao,
       descricao: p.descricao
     }));
 
@@ -128,7 +127,6 @@ async function salvarProduto(produto) {
     quantidade: produto.quantidade,
     quantidade_minima: produto.minimo,
     preco: produto.valor,
-    localizacao: produto.localizacao || '',
     descricao: produto.descricao || ''
   };
 
