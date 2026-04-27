@@ -4,7 +4,7 @@
 
 // Configuração do Supabase
 const SUPABASE_URL = 'https://iutunkefrzmyqzmrcbwa.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_Qe_echN1xLvD3sAWbBt1_Q_TpspdlX4';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1dHVua2VmcnpteXF6bXJjYndhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMDA1NjIsImV4cCI6MjA5Mjg3NjU2Mn0.m4lDIl62GA_0aucuT-G06mccfIGMx9GnTLOMm7Bkx2I';
 
 // Cliente Supabase
 let supabaseClient = null;
