@@ -51,12 +51,11 @@ async function carregarDados() {
     if (produtosError) throw produtosError;
     produtos = (produtosData || []).map(p => ({
       id: p.id,
-      nome: p.nome,
+       nome: p.nome,
       modelo: p.categoria,
       quantidade: p.quantidade,
       minimo: p.quantidade_minima,
       valor: p.preco,
-      localizacao: p.localizacao,
       descricao: p.descricao
     }));
 
@@ -123,12 +122,11 @@ async function salvarProduto(produto) {
   if (!supabaseClient) return null;
 
   const dadosSupabase = {
-    nome: produto.nome,
+     nome: produto.nome,
     categoria: produto.modelo,
     quantidade: produto.quantidade,
     quantidade_minima: produto.minimo,
     preco: produto.valor,
-    localizacao: produto.localizacao || '',
     descricao: produto.descricao || ''
   };
 
@@ -905,6 +903,7 @@ function initProdutosPage() {
 
     const nome = document.getElementById("nome").value.trim();
     const modelo = document.getElementById("modelo").value.trim();
+    const descricao = document.getElementById("descricao")?.value.trim() || "";
     const quantidade = Number(document.getElementById("quantidade").value);
     const minimo = Number(document.getElementById("minimo").value);
     const valor = Number(document.getElementById("valor").value);
@@ -922,7 +921,8 @@ function initProdutosPage() {
       modelo,
       quantidade,
       minimo,
-      valor
+      valor,
+      descricao
     };
 
     const resultado = await salvarProduto(produto);
