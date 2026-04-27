@@ -4,7 +4,7 @@
 
 // Configuração do Supabase
 const SUPABASE_URL = 'https://iutunkefrzmyqzmrcbwa.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1dHVua2VmcnpteXF6bXJjYndhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMDA1NjIsImV4cCI6MjA5Mjg3NjU2Mn0.m4lDIl62GA_0aucuT-G06mccfIGMx9GnTLOMm7Bkx2I';
+const SUPABASE_ANON_KEY = 'sb_publishable_Qe_echN1xLvD3sAWbBt1_Q_TpspdlX4';
 
 // Cliente Supabase
 let supabaseClient = null;
@@ -51,11 +51,12 @@ async function carregarDados() {
     if (produtosError) throw produtosError;
     produtos = (produtosData || []).map(p => ({
       id: p.id,
-       nome: p.nome,
+      nome: p.nome,
       modelo: p.categoria,
       quantidade: p.quantidade,
       minimo: p.quantidade_minima,
       valor: p.preco,
+      localizacao: p.localizacao,
       descricao: p.descricao
     }));
 
@@ -122,11 +123,12 @@ async function salvarProduto(produto) {
   if (!supabaseClient) return null;
 
   const dadosSupabase = {
-     nome: produto.nome,
+    nome: produto.nome,
     categoria: produto.modelo,
     quantidade: produto.quantidade,
     quantidade_minima: produto.minimo,
     preco: produto.valor,
+    localizacao: produto.localizacao || '',
     descricao: produto.descricao || ''
   };
 
@@ -900,11 +902,9 @@ function initProdutosPage() {
 
   form.addEventListener("submit", async function (e) {
     e.preventDefault();
-    console.log("Cliquei em salvar equipamento");
 
     const nome = document.getElementById("nome").value.trim();
     const modelo = document.getElementById("modelo").value.trim();
-    const descricao = document.getElementById("descricao")?.value.trim() || "";
     const quantidade = Number(document.getElementById("quantidade").value);
     const minimo = Number(document.getElementById("minimo").value);
     const valor = Number(document.getElementById("valor").value);
@@ -922,8 +922,7 @@ function initProdutosPage() {
       modelo,
       quantidade,
       minimo,
-      valor,
-      descricao
+      valor
     };
 
     const resultado = await salvarProduto(produto);
