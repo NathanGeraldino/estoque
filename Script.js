@@ -997,6 +997,7 @@ async function registrarMovimentacao(produtoId, tipo, quantidade, observacao = "
   };
 
   const resultado = await salvarMovimentacaoDB(movimentacao);
+  console.log("💾 Resultado insert:", resultado);
   return resultado !== null;
 }
 
@@ -1133,12 +1134,16 @@ function initMovimentacoesPage() {
   if (!form) return;
 
   form.addEventListener("submit", async function (e) {
+    console.log("🔥 Submit movimentação disparado");
+    
     e.preventDefault();
 
     const produtoId = document.getElementById("produtoMov").value;
     const tipo = document.getElementById("tipoMov").value;
     const quantidade = Number(document.getElementById("quantidadeMov").value);
     const observacao = document.getElementById("obsMov").value;
+
+    console.log("📦 Dados:", { produtoId, tipo, quantidade, observacao });
 
     if (!produtoId || !tipo || !quantidade) {
       alert("Preencha todos os campos obrigatórios.");
