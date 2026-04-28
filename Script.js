@@ -1734,7 +1734,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     alert('Erro ao conectar com o banco de dados. Verifique se a biblioteca Supabase está carregada.');
     return;
 
-    ativarRealtime();
   }
 
   // Carrega dados do banco
@@ -1771,6 +1770,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (pagina === "relatorios") {
     initRelatoriosPage();
   }
+
+  ativarRealtime();
 });
 
 // ============================================
