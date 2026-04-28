@@ -103,6 +103,38 @@ async function carregarDados() {
       dataDevolucao: a.data_devolucao,
       data: new Date(a.data_alocacao).toLocaleString('pt-BR')
     }));
+    
+    function ativarRealtime() {
+  if (!supabaseClient) return;
+
+  supabaseClient
+    .channel("estoque-realtime")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "equipamentos"
+      },
+      async () => {
+        await carregarDados();
+        refreshAll();
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "movimentacoes"
+      },
+      async () => {
+        await carregarDados();
+        refreshAll();
+      }
+    )
+    .subscribe();
+}
 
     // Carrega histórico de alocações
     const { data: histData, error: histError } = await supabaseClient
