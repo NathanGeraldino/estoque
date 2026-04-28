@@ -107,33 +107,31 @@ async function carregarDados() {
     function ativarRealtime() {
   if (!supabaseClient) return;
 
+  console.log("🔄 Ativando Realtime...");
+
   supabaseClient
     .channel("estoque-realtime")
     .on(
       "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "equipamentos"
-      },
-      async () => {
+      { event: "*", schema: "public", table: "equipamentos" },
+      async (payload) => {
+        console.log("📡 Mudança em equipamentos:", payload);
         await carregarDados();
         refreshAll();
       }
     )
     .on(
       "postgres_changes",
-      {
-        event: "*",
-        schema: "public",
-        table: "movimentacoes"
-      },
-      async () => {
+      { event: "*", schema: "public", table: "movimentacoes" },
+      async (payload) => {
+        console.log("📡 Mudança em movimentações:", payload);
         await carregarDados();
         refreshAll();
       }
     )
-    .subscribe();
+    .subscribe((status) => {
+      console.log("Status Realtime:", status);
+    });
 }
 
     // Carrega histórico de alocações
