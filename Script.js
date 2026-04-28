@@ -1509,6 +1509,7 @@ function renderRelatorioCategorias() {
   if (!container) return;
 
   const categorias = {};
+
   produtos.forEach((p) => {
     const cat = p.modelo || "Sem categoria";
     categorias[cat] = (categorias[cat] || 0) + Number(p.quantidade);
@@ -1522,41 +1523,71 @@ function renderRelatorioCategorias() {
   }
 
   container.innerHTML = `
-    <div class="categorias-lista">
-      ${lista.map(([cat, qtd]) => `
-        <div class="categoria-item">
-          <span class="categoria-nome">${cat}</span>
-          <span class="categoria-quantidade">${qtd} itens</span>
-        </div>
-      `).join("")}
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Categoria</th>
+            <th>Total de Itens</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${lista.map(([cat, qtd]) => `
+            <tr>
+              <td>${cat}</td>
+              <td>${qtd}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
     </div>
   `;
 }
-
 function renderRelatorioMaiorSaida() {
   const container = document.getElementById("relatorioMaiorSaida");
   if (!container) return;
 
-  const { labels, valores } = obterDadosMaiorSaida();
+  const saidas = movimentacoes.filter((mov) => mov.tipo === "saida");
+  const mapa = {};
 
-  if (!labels.length) {
+  saidas.forEach((mov) => {
+    if (!mapa[mov.produtoNome]) {
+      mapa[mov.produtoNome] = 0;
+    }
+    mapa[mov.produtoNome] += Number(mov.quantidade);
+  });
+
+  const ranking = Object.entries(mapa)
+    .sort((a, b) => b[1] - a[1]);
+
+  if (!ranking.length) {
     container.innerHTML = `<div class="empty">Nenhuma saída registrada.</div>`;
     return;
   }
 
   container.innerHTML = `
-    <div class="ranking-lista">
-      ${labels.map((nome, i) => `
-        <div class="ranking-item">
-          <span class="ranking-posicao">${i + 1}°</span>
-          <span class="ranking-nome">${nome}</span>
-          <span class="ranking-quantidade">${valores[i]} unidades</span>
-        </div>
-      `).join("")}
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Equipamento</th>
+            <th>Total de Saídas</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${ranking.map(([nome, qtd], i) => `
+            <tr>
+              <td>${i + 1}</td>
+              <td class="produto-nome">${nome}</td>
+              <td>${qtd}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
     </div>
   `;
 }
-
 // ============================================
 // EXPORTAÇÃO
 // ============================================
