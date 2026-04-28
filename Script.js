@@ -1458,40 +1458,48 @@ function renderRelatorioResumo() {
   const container = document.getElementById("relatorioResumo");
   if (!container) return;
 
-  const totalItens = produtos.reduce((acc, p) => acc + Number(p.quantidade), 0);
-  const valorTotal = produtos.reduce(
-    (acc, p) => acc + Number(p.quantidade) * Number(p.valor),
-    0
-  );
-  const totalEntradas = movimentacoes
-    .filter((m) => m.tipo === "entrada")
-    .reduce((acc, m) => acc + Number(m.quantidade), 0);
-  const totalSaidas = movimentacoes
-    .filter((m) => m.tipo === "saida")
-    .reduce((acc, m) => acc + Number(m.quantidade), 0);
+  if (!produtos.length) {
+    container.innerHTML = `<div class="empty">Nenhum equipamento cadastrado.</div>`;
+    return;
+  }
 
   container.innerHTML = `
-    <div class="resumo-grid">
-      <div class="resumo-item">
-        <span class="resumo-label">Total de Tipos:</span>
-        <span class="resumo-valor">${produtos.length}</span>
-      </div>
-      <div class="resumo-item">
-        <span class="resumo-label">Total de Itens:</span>
-        <span class="resumo-valor">${totalItens}</span>
-      </div>
-      <div class="resumo-item">
-        <span class="resumo-label">Valor Total:</span>
-        <span class="resumo-valor">${formatarMoeda(valorTotal)}</span>
-      </div>
-      <div class="resumo-item">
-        <span class="resumo-label">Total Entradas:</span>
-        <span class="resumo-valor">${totalEntradas}</span>
-      </div>
-      <div class="resumo-item">
-        <span class="resumo-label">Total Saídas:</span>
-        <span class="resumo-valor">${totalSaidas}</span>
-      </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Equipamento</th>
+            <th>Categoria</th>
+            <th>Quantidade</th>
+            <th>Mínimo</th>
+            <th>Valor unitário</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${produtos.map((item) => {
+            const baixo = Number(item.quantidade) <= Number(item.minimo);
+            const total = Number(item.quantidade) * Number(item.valor);
+
+            return `
+              <tr>
+                <td class="produto-nome">${item.nome}</td>
+                <td>${item.modelo || "-"}</td>
+                <td>${item.quantidade}</td>
+                <td>${item.minimo}</td>
+                <td>${formatarMoeda(item.valor)}</td>
+                <td>${formatarMoeda(total)}</td>
+                <td>
+                  <span class="status ${baixo ? "low" : "ok"}">
+                    ${baixo ? "Estoque baixo" : "Normal"}
+                  </span>
+                </td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
     </div>
   `;
 }
