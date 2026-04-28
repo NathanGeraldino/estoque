@@ -1596,25 +1596,47 @@ function renderRelatorioMaiorSaida() {
 // ============================================
 
 function exportarCSV() {
-  const headers = ['ID', 'Nome', 'Categoria', 'Quantidade', 'Mínimo', 'Valor Unitário'];
-  const rows = produtos.map(p => [
-    p.id,
-    p.nome,
-    p.modelo || '',
-    p.quantidade,
-    p.minimo,
-    p.valor
-  ]);
+  if (!produtos.length) {
+    mostrarMensagem("Nenhum equipamento para exportar", "warning");
+    return;
+  }
 
-  const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+  const dados = produtos.map((item) => {
+    const baixo = Number(item.quantidade) <= Number(item.minimo);
+    const total = Number(item.quantidade) * Number(item.valor);
 
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `estoque_${new Date().toISOString().split('T')[0]}.csv`;
-  link.click();
+    return {
+      "Equipamento": item.nome,
+      "Categoria": item.modelo || "-",
+      "Quantidade": item.quantidade,
+      "Mínimo": item.minimo,
+      "Valor unitário": Number(item.valor),
+      "Total": total,
+      "Status": baixo ? "Estoque baixo" : "Normal"
+    };
+  });
 
-  mostrarMensagem('CSV exportado com sucesso!');
+  const ws = XLSX.utils.json_to_sheet(dados);
+
+  ws["!cols"] = [
+    { wch: 35 },
+    { wch: 25 },
+    { wch: 12 },
+    { wch: 10 },
+    { wch: 18 },
+    { wch: 18 },
+    { wch: 18 }
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Relatório Estoque");
+
+  XLSX.writeFile(
+    wb,
+    `relatorio_estoque_${new Date().toISOString().split("T")[0]}.xlsx`
+  );
+
+  mostrarMensagem("Relatório exportado com sucesso!");
 }
 
 function exportarPDF() {
