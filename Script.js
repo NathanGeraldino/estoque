@@ -1452,6 +1452,9 @@ function initRelatoriosPage() {
   renderRelatorioResumo();
   renderRelatorioCategorias();
   renderRelatorioMaiorSaida();
+
+  document.getElementById("exportarCsv")?.addEventListener("click", exportarCSV);
+  document.getElementById("imprimirPdf")?.addEventListener("click", exportarPDF);
 }
 
 function renderRelatorioResumo() {
