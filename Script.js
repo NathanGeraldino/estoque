@@ -1650,6 +1650,28 @@ function exportarPDF() {
 
   mostrarMensagem('PDF exportado com sucesso!');
 }
+function exportarMovimentacoesExcel() {
+  if (!movimentacoes.length) {
+    mostrarMensagem("Nenhuma movimentação para exportar", "warning");
+    return;
+  }
+
+  const dados = movimentacoes.map(mov => ({
+    Data: mov.data,
+    Equipamento: mov.produtoNome,
+    Tipo: mov.tipo === "entrada" ? "Entrada" : "Saída",
+    Quantidade: mov.quantidade,
+    Observação: mov.observacao || "-"
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(dados);
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Movimentações");
+  XLSX.writeFile(wb, `movimentacoes_${new Date().toISOString().split("T")[0]}.xlsx`);
+
+  mostrarMensagem("Movimentações exportadas com sucesso!");
+}
 
 // ============================================
 // REFRESH E INICIALIZAÇÃO
