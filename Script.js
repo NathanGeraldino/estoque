@@ -1733,6 +1733,34 @@ document.addEventListener("DOMContentLoaded", async function () {
     return;
 
   }
+  
+   mostrarLoading(true);
+  await carregarDados();
+  mostrarLoading(false);
+
+  atualizarMenuAtivo();
+  refreshAll();
+
+  const pagina = document.body.dataset.page;
+
+  if (pagina === "equipamentos") {
+    initProdutosPage();
+  }
+
+  if (pagina === "movimentacoes") {
+    initMovimentacoesPage();
+  }
+
+  if (pagina === "alocacoes") {
+    initAlocacoesPage();
+  }
+
+  if (pagina === "relatorios") {
+    initRelatoriosPage();
+  }
+
+  ativarRealtime();
+});
 
 // ============================================
 // EXPORTAÇÃO MOVIMENTAÇÕES
