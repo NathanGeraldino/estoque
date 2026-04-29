@@ -877,7 +877,6 @@ async function excluirProduto(id) {
   const confirmar = confirm("Deseja realmente excluir este Equipamento?");
   if (!confirmar) return;
 
-  mostrarLoading(true);
   
   const sucesso = await excluirProdutoDB(id);
   
@@ -913,7 +912,6 @@ function initProdutosPage() {
       return;
     }
 
-    mostrarLoading(true);
 
     const produto = {
       id: editandoId || null,
@@ -1110,7 +1108,6 @@ function cancelarEdicaoMovimentacao() {
 async function excluirMovimentacao(id) {
   if (!confirm("Deseja realmente excluir esta movimentação?")) return;
 
-  mostrarLoading(true);
   
   const sucesso = await excluirMovimentacaoDB(id);
   
@@ -1151,7 +1148,6 @@ function initMovimentacoesPage() {
       return;
     }
 
-    mostrarLoading(true);
 
     let sucesso = false;
 
@@ -1346,7 +1342,6 @@ function editarAlocacao(id) {
 async function devolverAlocacao(id) {
   if (!confirm("Confirma a devolução deste equipamento?")) return;
 
-  mostrarLoading(true);
   
   const sucesso = await devolverAlocacaoDB(id);
   
@@ -1364,7 +1359,6 @@ async function devolverAlocacao(id) {
 async function excluirAlocacao(id) {
   if (!confirm("Deseja realmente excluir esta alocação?")) return;
 
-  mostrarLoading(true);
   
   const sucesso = await excluirAlocacaoDB(id);
   
@@ -1401,7 +1395,6 @@ function initAlocacoesPage() {
 
     const produto = produtos.find((p) => String(p.id) === String(produtoId));
 
-    mostrarLoading(true);
 
     let sucesso = false;
 
@@ -1734,9 +1727,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   }
   
-   mostrarLoading(true);
   await carregarDados();
-  mostrarLoading(false);
 
   atualizarMenuAtivo();
   refreshAll();
