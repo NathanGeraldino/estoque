@@ -104,35 +104,6 @@ async function carregarDados() {
       data: new Date(a.data_alocacao).toLocaleString('pt-BR')
     }));
     
-    function ativarRealtime() {
-  if (!supabaseClient) return;
-
-  console.log("🔄 Ativando Realtime...");
-
-  supabaseClient
-    .channel("estoque-realtime")
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "equipamentos" },
-      async (payload) => {
-        console.log("📡 Mudança em equipamentos:", payload);
-        await carregarDados();
-        refreshAll();
-      }
-    )
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "movimentacoes" },
-      async (payload) => {
-        console.log("📡 Mudança em movimentações:", payload);
-        await carregarDados();
-        refreshAll();
-      }
-    )
-    .subscribe((status) => {
-      console.log("Status Realtime:", status);
-    });
-}
 
     // Carrega histórico de alocações
     const { data: histData, error: histError } = await supabaseClient
@@ -1724,6 +1695,35 @@ function refreshAll() {
   renderRelatorioCategorias();
   renderRelatorioMaiorSaida();
 }
+function ativarRealtime() {
+  if (!supabaseClient) return;
+
+  console.log("🔄 Ativando Realtime...");
+
+  supabaseClient
+    .channel("estoque-realtime")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "equipamentos" },
+      async (payload) => {
+        console.log("📡 Mudança em equipamentos:", payload);
+        await carregarDados();
+        refreshAll();
+      }
+    )
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "movimentacoes" },
+      async (payload) => {
+        console.log("📡 Mudança em movimentações:", payload);
+        await carregarDados();
+        refreshAll();
+      }
+    )
+    .subscribe((status) => {
+      console.log("Status Realtime:", status);
+    });
+}
 
 // Inicialização
 document.addEventListener("DOMContentLoaded", async function () {
@@ -1733,44 +1733,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     return;
 
   }
-
-  // Carrega dados do banco
-  mostrarLoading(true);
-  await carregarDados();
-  mostrarLoading(false);
-
-  // Atualiza interface
-  atualizarMenuAtivo();
-  refreshAll();
-
-  // Inicializa páginas específicas
-  const pagina = document.body.dataset.page;
-
-  if (pagina === "dashboard" || !pagina) {
-    atualizarCards();
-    renderDashboardLowStock();
-    renderHomeUltimasMovimentacoes();
-    renderDashboardCharts();
-  }
-
-  if (pagina === "equipamentos") {
-    initProdutosPage();
-  }
-
-  if (pagina === "movimentacoes") {
-    initMovimentacoesPage();
-  }
-
-  if (pagina === "alocacoes") {
-    initAlocacoesPage();
-  }
-
-  if (pagina === "relatorios") {
-    initRelatoriosPage();
-  }
-
-  ativarRealtime();
-});
 
 // ============================================
 // EXPORTAÇÃO MOVIMENTAÇÕES
