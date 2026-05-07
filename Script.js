@@ -800,6 +800,7 @@ function renderTabelaProdutos() {
       <table>
         <thead>
           <tr>
+            <th>ID</th>
             <th>Equipamento</th>
             <th>Modelo</th>
             <th>Quantidade</th>
@@ -817,6 +818,7 @@ function renderTabelaProdutos() {
 
             return `
               <tr>
+                <td>${item.id}</td>
                 <td class="produto-nome">${item.nome}</td>
                 <td>${item.modelo || "-"}</td>
                 <td>${item.quantidade}</td>
