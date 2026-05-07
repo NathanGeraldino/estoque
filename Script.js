@@ -552,7 +552,7 @@ function renderDashboardLowStock() {
             <tr>
               <td class="produto-nome">${item.nome}</td>
               <td>${item.modelo || "-"}</td>
-              <td>${item.data}</td>
+              <td>${item.produtoId}</td>
               <td>${item.quantidade}</td>
               <td>${item.minimo}</td>
               <td><span class="status low">Estoque baixo</span></td>
