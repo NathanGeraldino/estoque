@@ -81,38 +81,9 @@ async function carregarDados() {
       dataFiltro: m.data.split('T')[0]
     }));
 
-    // Carrega alocações
-    const { data: alocData, error: alocError } = await supabaseClient
-      .from('alocacoes')
-      .select('*, equipamentos(nome, categoria)')
-      .order('data_alocacao', { ascending: false });
-
-    if (alocError) throw alocError;
-    alocacoes = (alocData || []).map(a => ({
-      id: a.id,
-      produtoId: a.equipamento_id,
-      produtoNome: a.equipamentos?.nome || '',
-      equipamento: a.equipamentos?.nome || '',
-      modelo: a.equipamentos?.categoria || '',
-      responsavel: a.responsavel,
-      setor: a.setor,
-      quantidade: a.quantidade,
-      status: a.status,
-      observacoes: a.observacoes,
-      dataAlocacao: a.data_alocacao,
-      dataDevolucao: a.data_devolucao,
-      data: new Date(a.data_alocacao).toLocaleString('pt-BR')
-    }));
-    
-
-    // Carrega histórico de alocações
-    const { data: histData, error: histError } = await supabaseClient
-      .from('historico_alocacoes')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (histError) throw histError;
-    historicoAlocacoes = histData || [];
+       // Alocações desativadas
+    alocacoes = [];
+    historicoAlocacoes = [];
 
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
