@@ -159,6 +159,20 @@ async function salvarProduto(produto) {
     return null;
   }
 }
+await registrarMovimentacaoAutomatica({
+  tipo: "Entrada",
+  equipamento: nome,
+  modelo: modelo,
+  quantidade: quantidade,
+  observacao: "Equipamento cadastrado no estoque"
+});
+await registrarMovimentacaoAutomatica({
+  tipo: "Edição",
+  equipamento: nome,
+  modelo: modelo,
+  quantidade: quantidade,
+  observacao: "Cadastro do equipamento editado"
+});
 
 async function excluirProdutoDB(id) {
   if (!supabaseClient) return false;
@@ -1779,3 +1793,28 @@ function exportarMovimentacoesExcel() {
 
   mostrarMensagem("Movimentações exportadas com sucesso!");
 }
+async function registrarMovimentacaoAutomatica(dados) {
+  const movimentacao = {
+    tipo: dados.tipo, // Entrada ou Edição
+    equipamento: dados.equipamento,
+    modelo: dados.modelo || "",
+    quantidade: dados.quantidade || 0,
+    data: new Date().toISOString(),
+    observacao: dados.observacao || ""
+  };
+
+  const { error } = await supabaseClient
+    .from("movimentacoes")
+    .insert([movimentacao]);
+
+  if (error) {
+    console.error("Erro ao registrar movimentação:", error);
+  }
+}
+
+
+
+
+
+
+
