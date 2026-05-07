@@ -550,9 +550,9 @@ function renderDashboardLowStock() {
         <tbody>
           ${baixos.map((item) => `
             <tr>
+              <td>${item.produtoId}</td>
               <td class="produto-nome">${item.nome}</td>
               <td>${item.modelo || "-"}</td>
-              <td>${item.produtoId}</td>
               <td>${item.quantidade}</td>
               <td>${item.minimo}</td>
               <td><span class="status low">Estoque baixo</span></td>
