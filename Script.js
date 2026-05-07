@@ -822,7 +822,7 @@ function renderTabelaProdutos() {
 
             return `
               <tr>
-                <td>${item.id}</td>
+                <td>${item.id || "-"}</td>
                 <td class="produto-nome">${item.nome}</td>
                 <td>${item.modelo || "-"}</td>
                 <td>${item.quantidade}</td>
