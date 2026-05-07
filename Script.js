@@ -528,6 +528,7 @@ function renderDashboardLowStock() {
   const baixos = produtos.filter(
     (item) => Number(item.quantidade) <= Number(item.minimo)
   );
+  console.log(baixos);
 
   if (!baixos.length) {
     container.innerHTML = `<div class="empty">Nenhum item com estoque baixo no momento.</div>`;
