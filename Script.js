@@ -74,7 +74,7 @@ async function carregarDados() {
       modelo: m.equipamentos?.categoria || '',
       tipo: m.tipo,
       quantidade: m.quantidade,
-      observacao: m.razão,
+      observacao: m.motivo,
       responsavel: m.responsavel,
       data: new Date(m.data).toLocaleString('pt-BR'),
       dataISO: m.data,
@@ -152,18 +152,7 @@ async function salvarProduto(produto) {
         .single();
 
       if (error) throw error;
-
-// REGISTRA MOVIMENTAÇÃO DE EDIÇÃO
-await salvarMovimentacaoDB({
-  produtoId: data.id,
-  tipo: 'edicao',
-  quantidade: produto.quantidade,
-  observacao: 'Equipamento editado',
-  responsavel: 'Sistema',
-  dataISO: new Date().toISOString()
-});
-
-return data;
+      return data;
     }
   } catch (error) {
     console.error('Erro ao salvar produto:', error);
@@ -195,7 +184,7 @@ async function salvarMovimentacaoDB(movimentacao) {
     equipamento_id: movimentacao.produtoId,
     tipo: movimentacao.tipo,
     quantidade: movimentacao.quantidade,
-    razão: movimentacao.observacao || '',
+    motivo: movimentacao.observacao || '',
     responsavel: movimentacao.responsavel || '',
     data: movimentacao.dataISO || new Date().toISOString()
   };
@@ -235,19 +224,7 @@ async function atualizarMovimentacaoDB(id, movimentacao) {
       .single();
 
     if (error) throw error;
-
-// REGISTRA MOVIMENTAÇÃO DE CADASTRO
-await salvarMovimentacaoDB({
-  produtoId: data.id,
-  tipo: 'entrada',
-  quantidade: produto.quantidade,
-  observacao: 'Equipamento cadastrado',
-  responsavel: 'Sistema',
-  dataISO: new Date().toISOString()
-});
-
-return data;
-    
+    return data;
   } catch (error) {
     console.error('Erro ao atualizar movimentação:', error);
     return null;
@@ -1069,13 +1046,7 @@ function renderTabelaMovimentacoes() {
               <td class="produto-nome">${mov.produtoNome}</td>
               <td>
                 <span class="status ${mov.tipo === "entrada" ? "ok" : "low"}">
-                  ${
-  mov.tipo === "entrada"
-    ? "Entrada"
-    : mov.tipo === "saida"
-    ? "Saída"
-    : "Edição"
-}
+                  ${mov.tipo === "entrada" ? "Entrada" : "Saída"}
                 </span>
               </td>
               <td>${mov.quantidade}</td>
