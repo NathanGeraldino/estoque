@@ -152,7 +152,18 @@ async function salvarProduto(produto) {
         .single();
 
       if (error) throw error;
-      return data;
+
+// REGISTRA MOVIMENTAÇÃO DE EDIÇÃO
+await salvarMovimentacaoDB({
+  produtoId: data.id,
+  tipo: 'edicao',
+  quantidade: produto.quantidade,
+  observacao: 'Equipamento editado',
+  responsavel: 'Sistema',
+  dataISO: new Date().toISOString()
+});
+
+return data;
     }
   } catch (error) {
     console.error('Erro ao salvar produto:', error);
@@ -224,7 +235,19 @@ async function atualizarMovimentacaoDB(id, movimentacao) {
       .single();
 
     if (error) throw error;
-    return data;
+
+// REGISTRA MOVIMENTAÇÃO DE CADASTRO
+await salvarMovimentacaoDB({
+  produtoId: data.id,
+  tipo: 'entrada',
+  quantidade: produto.quantidade,
+  observacao: 'Equipamento cadastrado',
+  responsavel: 'Sistema',
+  dataISO: new Date().toISOString()
+});
+
+return data;
+    
   } catch (error) {
     console.error('Erro ao atualizar movimentação:', error);
     return null;
@@ -1046,7 +1069,13 @@ function renderTabelaMovimentacoes() {
               <td class="produto-nome">${mov.produtoNome}</td>
               <td>
                 <span class="status ${mov.tipo === "entrada" ? "ok" : "low"}">
-                  ${mov.tipo === "entrada" ? "Entrada" : "Saída"}
+                  ${
+  mov.tipo === "entrada"
+    ? "Entrada"
+    : mov.tipo === "saida"
+    ? "Saída"
+    : "Edição"
+}
                 </span>
               </td>
               <td>${mov.quantidade}</td>
