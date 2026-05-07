@@ -539,6 +539,7 @@ function renderDashboardLowStock() {
       <table>
         <thead>
           <tr>
+            <th>ID</th>
             <th>Equipamentos</th>
             <th>Categoria</th>
             <th>Quantidade</th>
@@ -549,6 +550,7 @@ function renderDashboardLowStock() {
         <tbody>
           ${baixos.map((item) => `
             <tr>
+              <td>${mov.data}</td>
               <td class="produto-nome">${item.nome}</td>
               <td>${item.modelo || "-"}</td>
               <td>${item.quantidade}</td>
