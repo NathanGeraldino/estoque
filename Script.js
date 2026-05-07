@@ -74,7 +74,7 @@ async function carregarDados() {
       modelo: m.equipamentos?.categoria || '',
       tipo: m.tipo,
       quantidade: m.quantidade,
-      observacao: m.motivo,
+      observacao: m.razão,
       responsavel: m.responsavel,
       data: new Date(m.data).toLocaleString('pt-BR'),
       dataISO: m.data,
@@ -195,7 +195,7 @@ async function salvarMovimentacaoDB(movimentacao) {
     equipamento_id: movimentacao.produtoId,
     tipo: movimentacao.tipo,
     quantidade: movimentacao.quantidade,
-    motivo: movimentacao.observacao || '',
+    razão: movimentacao.observacao || '',
     responsavel: movimentacao.responsavel || '',
     data: movimentacao.dataISO || new Date().toISOString()
   };
