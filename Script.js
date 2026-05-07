@@ -877,6 +877,30 @@ async function excluirProduto(id) {
   const confirmar = confirm("Deseja realmente excluir este Equipamento?");
   if (!confirmar) return;
 
+  const produto = produtos.find(
+  (p) => String(p.id) === String(id)
+);
+
+  if (produto) {
+  await salvarMovimentacaoDB({
+    produtoId: produto.id,
+    tipo: "exclusao",
+    quantidade: produto.quantidade,
+    observacao: `Equipamento excluído: ${produto.nome}`,
+    dataISO: new Date().toISOString()
+  });
+}
+
+  if (produto) {
+  await salvarMovimentacaoDB({
+    produtoId: produto.id,
+    tipo: "exclusao",
+    quantidade: produto.quantidade,
+    observacao: `Equipamento excluído: ${produto.nome}`,
+    dataISO: new Date().toISOString()
+  });
+}
+
   
   const sucesso = await excluirProdutoDB(id);
   
@@ -911,6 +935,13 @@ function initProdutosPage() {
       alert("Informe o equipamento.");
       return;
     }
+    let produtoAntigo = null;
+
+if (editandoId) {
+  produtoAntigo = produtos.find(
+    (p) => String(p.id) === String(editandoId)
+  );
+}
 
 
     const produto = {
@@ -925,13 +956,76 @@ function initProdutosPage() {
     const resultado = await salvarProduto(produto);
 
     if (resultado) {
-      mostrarMensagem(editandoId ? 'Equipamento atualizado!' : 'Equipamento cadastrado!');
-      limparFormularioProduto();
-      await carregarDados();
-      refreshAll();
-    } else {
-      mostrarMensagem('Erro ao salvar equipamento', 'error');
+
+  // =========================
+  // REGISTRAR MOVIMENTAÇÃO
+  // =========================
+
+  if (editandoId && produtoAntigo) {
+
+    const diferenca =
+      Number(quantidade) - Number(produtoAntigo.quantidade);
+
+    // Quantidade aumentou
+    if (diferenca > 0) {
+      await salvarMovimentacaoDB({
+        produtoId: resultado.id,
+        tipo: "entrada",
+        quantidade: diferenca,
+        observacao: "Quantidade aumentada na edição",
+        dataISO: new Date().toISOString()
+      });
     }
+
+    // Quantidade diminuiu
+    else if (diferenca < 0) {
+      await salvarMovimentacaoDB({
+        produtoId: resultado.id,
+        tipo: "saida",
+        quantidade: Math.abs(diferenca),
+        observacao: "Quantidade reduzida na edição",
+        dataISO: new Date().toISOString()
+      });
+    }
+
+    // Registro da edição
+    await salvarMovimentacaoDB({
+      produtoId: resultado.id,
+      tipo: "edicao",
+      quantidade: quantidade,
+      observacao: "Equipamento editado",
+      dataISO: new Date().toISOString()
+    });
+
+  } else {
+
+    // Novo equipamento
+    await salvarMovimentacaoDB({
+      produtoId: resultado.id,
+      tipo: "entrada",
+      quantidade: quantidade,
+      observacao: "Novo equipamento cadastrado",
+      dataISO: new Date().toISOString()
+    });
+  }
+
+  mostrarMensagem(
+    editandoId
+      ? 'Equipamento atualizado!'
+      : 'Equipamento cadastrado!'
+  );
+
+  limparFormularioProduto();
+
+  await carregarDados();
+
+  refreshAll();
+
+} else {
+
+  mostrarMensagem('Erro ao salvar equipamento', 'error');
+
+}
 
     mostrarLoading(false);
   });
@@ -1045,9 +1139,23 @@ function renderTabelaMovimentacoes() {
               <td>${mov.data}</td>
               <td class="produto-nome">${mov.produtoNome}</td>
               <td>
-                <span class="status ${mov.tipo === "entrada" ? "ok" : "low"}">
-                  ${mov.tipo === "entrada" ? "Entrada" : "Saída"}
-                </span>
+                <span class="status ${
+  mov.tipo === "entrada"
+    ? "ok"
+    : mov.tipo === "saida"
+    ? "low"
+    : "warning"
+}">
+  ${
+    mov.tipo === "entrada"
+      ? "Entrada"
+      : mov.tipo === "saida"
+      ? "Saída"
+      : mov.tipo === "edicao"
+      ? "Edição"
+      : "Exclusão"
+  }
+</span>
               </td>
               <td>${mov.quantidade}</td>
               <td>${mov.observacao || "-"}</td>
