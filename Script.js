@@ -581,6 +581,7 @@ function renderHomeUltimasMovimentacoes() {
         <thead>
           <tr>
             <th>Data</th>
+            <th>ID</th>
             <th>Equipamento</th>
             <th>Tipo</th>
             <th>Quantidade</th>
@@ -591,6 +592,7 @@ function renderHomeUltimasMovimentacoes() {
           ${ultimas.map((mov) => `
             <tr>
               <td>${mov.data}</td>
+              <td>${mov.produtoId}</td>
               <td class="produto-nome">${mov.produtoNome}</td>
               <td>
                 <span class="status ${mov.tipo === "entrada" ? "ok" : "low"}">
@@ -1128,6 +1130,7 @@ function renderTabelaMovimentacoes() {
         <thead>
           <tr>
             <th>Data</th>
+            <th>ID</th>
             <th>Equipamento</th>
             <th>Tipo</th>
             <th>Quantidade</th>
@@ -1139,6 +1142,7 @@ function renderTabelaMovimentacoes() {
           ${lista.map((mov) => `
             <tr>
               <td>${mov.data}</td>
+              <td>${mov.produtoId}</td>
               <td class="produto-nome">${mov.produtoNome}</td>
               <td>
                 <span class="status ${
