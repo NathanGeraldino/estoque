@@ -1814,35 +1814,33 @@ function calcularSituacaoInventario(qtdSistema, qtdConferida) {
 }
 
 async function salvarConferenciaInventario(dados) {
-
   try {
+    const { id, ...dadosSemId } = dados;
 
-    if (dados.id) {
-
+    if (id) {
       const { data, error } = await supabaseClient
         .from("inventario_trimestral")
-        .update(dados)
-        .eq("id", dados.id)
+        .update(dadosSemId)
+        .eq("id", id)
         .select()
         .single();
 
       if (error) throw error;
-
       return data;
     }
 
     const { data, error } = await supabaseClient
       .from("inventario_trimestral")
-      .insert([dados])
+      .insert([dadosSemId])
       .select()
       .single();
 
     if (error) throw error;
-
     return data;
 
   } catch (error) {
     console.error("Erro ao salvar conferência:", error);
+    alert(error.message || "Erro ao salvar conferência");
     return null;
   }
 }
