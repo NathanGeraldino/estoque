@@ -1838,10 +1838,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (pagina === "relatorios") {
     initRelatoriosPage();
   }
-  
-  if (pagina === "inventario") {
-  initInventarioPage();
-}
 
   ativarRealtime();
 });
