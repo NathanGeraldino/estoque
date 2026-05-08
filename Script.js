@@ -1673,6 +1673,285 @@ function renderRelatorioMaiorSaida() {
     </div>
   `;
 }
+
+let inventarioTrimestral = [];
+
+function obterTrimestreAtual() {
+  const agora = new Date();
+  const ano = agora.getFullYear();
+  const mes = agora.getMonth() + 1;
+  const trimestre = Math.ceil(mes / 3);
+
+  return `${ano}-T${trimestre}`;
+}
+
+async function carregarInventarioTrimestral() {
+  if (!supabaseClient) return;
+
+  const trimestreAtual = obterTrimestreAtual();
+
+  try {
+    const { data, error } = await supabaseClient
+      .from("inventario_trimestral")
+      .select("*")
+      .eq("trimestre", trimestreAtual)
+      .order("id", { ascending: true });
+
+    if (error) throw error;
+
+    inventarioTrimestral = data || [];
+  } catch (error) {
+    console.error("Erro ao carregar inventário trimestral:", error);
+  }
+}
+
+async function salvarConferenciaTrimestral(equipamento) {
+  if (!supabaseClient) return null;
+
+  const trimestreAtual = obterTrimestreAtual();
+
+  const dados = {
+    equipamento_id: equipamento.equipamento_id,
+    equipamento_nome: equipamento.equipamento_nome,
+    modelo: equipamento.modelo || "",
+    quantidade_sistema: equipamento.quantidade_sistema,
+    quantidade_conferida: equipamento.quantidade_conferida,
+    situacao: equipamento.situacao,
+    responsavel: equipamento.responsavel || "",
+    observacao: equipamento.observacao || "",
+    trimestre: trimestreAtual,
+    data_conferencia: new Date().toISOString()
+  };
+
+  try {
+    if (equipamento.id) {
+      const { data, error } = await supabaseClient
+        .from("inventario_trimestral")
+        .update(dados)
+        .eq("id", equipamento.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("inventario_trimestral")
+      .insert([dados])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+
+  } catch (error) {
+    console.error("Erro ao salvar conferência:", error);
+    return null;
+  }
+}
+
+function obterRegistroInventario(produtoId) {
+  return inventarioTrimestral.find(
+    (item) => String(item.equipamento_id) === String(produtoId)
+  );
+}
+
+function calcularSituacaoInventario(qtdSistema, qtdConferida) {
+  if (qtdConferida === "" || qtdConferida === null || qtdConferida === undefined) {
+    return "pendente";
+  }
+
+  return Number(qtdSistema) === Number(qtdConferida) ? "ok" : "divergente";
+}
+
+function renderResumoInventario() {
+  const container = document.getElementById("resumoInventario");
+  if (!container) return;
+
+  const trimestreAtual = obterTrimestreAtual();
+
+  const total = produtos.length;
+
+  const conferidos = inventarioTrimestral.filter(
+    (i) => i.situacao === "ok" || i.situacao === "divergente"
+  ).length;
+
+  const divergentes = inventarioTrimestral.filter(
+    (i) => i.situacao === "divergente"
+  ).length;
+
+  const pendentes = total - conferidos;
+
+  container.innerHTML = `
+    <div class="card small-card">
+      <p>Trimestre atual</p>
+      <h3>${trimestreAtual}</h3>
+    </div>
+
+    <div class="card small-card">
+      <p>Total de equipamentos</p>
+      <h3>${total}</h3>
+    </div>
+
+    <div class="card small-card">
+      <p>Conferidos</p>
+      <h3>${conferidos}</h3>
+    </div>
+
+    <div class="card small-card">
+      <p>Pendentes</p>
+      <h3>${pendentes}</h3>
+    </div>
+
+    <div class="card small-card">
+      <p>Divergentes</p>
+      <h3>${divergentes}</h3>
+    </div>
+  `;
+}
+
+function renderTabelaInventario() {
+  const container = document.getElementById("tabelaInventario");
+  if (!container) return;
+
+  if (!produtos.length) {
+    container.innerHTML = `<div class="empty">Nenhum equipamento cadastrado.</div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Equipamento</th>
+            <th>Modelo</th>
+            <th>Qtd. Sistema</th>
+            <th>Qtd. Conferida</th>
+            <th>Situação</th>
+            <th>Responsável</th>
+            <th>Observação</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          ${produtos.map((produto) => {
+            const registro = obterRegistroInventario(produto.id);
+            const qtdConferida = registro?.quantidade_conferida ?? "";
+            const situacao = registro?.situacao || "pendente";
+
+            return `
+              <tr>
+                <td>${produto.id}</td>
+                <td class="produto-nome">${produto.nome}</td>
+                <td>${produto.modelo || "-"}</td>
+                <td>${produto.quantidade}</td>
+
+                <td>
+                  <input 
+                    type="number" 
+                    id="qtdInv_${produto.id}" 
+                    value="${qtdConferida}" 
+                    min="0"
+                    class="input-table"
+                  >
+                </td>
+
+                <td>
+                  <span class="status ${
+                    situacao === "ok"
+                      ? "ok"
+                      : situacao === "divergente"
+                      ? "low"
+                      : "warning"
+                  }">
+                    ${
+                      situacao === "ok"
+                        ? "OK"
+                        : situacao === "divergente"
+                        ? "Divergente"
+                        : "Pendente"
+                    }
+                  </span>
+                </td>
+
+                <td>
+                  <input 
+                    type="text" 
+                    id="respInv_${produto.id}" 
+                    value="${registro?.responsavel || ""}" 
+                    placeholder="Responsável"
+                    class="input-table"
+                  >
+                </td>
+
+                <td>
+                  <input 
+                    type="text" 
+                    id="obsInv_${produto.id}" 
+                    value="${registro?.observacao || ""}" 
+                    placeholder="Observação"
+                    class="input-table"
+                  >
+                </td>
+
+                <td>
+                  <button class="btn btn-primary" onclick="conferirEquipamentoTrimestral('${produto.id}')">
+                    Salvar
+                  </button>
+                </td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+async function conferirEquipamentoTrimestral(produtoId) {
+  const produto = produtos.find((p) => String(p.id) === String(produtoId));
+  if (!produto) return;
+
+  const registro = obterRegistroInventario(produtoId);
+
+  const qtdInput = document.getElementById(`qtdInv_${produtoId}`);
+  const respInput = document.getElementById(`respInv_${produtoId}`);
+  const obsInput = document.getElementById(`obsInv_${produtoId}`);
+
+  const qtdConferida = qtdInput.value;
+  const situacao = calcularSituacaoInventario(produto.quantidade, qtdConferida);
+
+  const resultado = await salvarConferenciaTrimestral({
+    id: registro?.id || null,
+    equipamento_id: produto.id,
+    equipamento_nome: produto.nome,
+    modelo: produto.modelo,
+    quantidade_sistema: produto.quantidade,
+    quantidade_conferida: Number(qtdConferida),
+    situacao,
+    responsavel: respInput.value,
+    observacao: obsInput.value
+  });
+
+  if (resultado) {
+    mostrarMensagem("Conferência salva!");
+    await carregarInventarioTrimestral();
+    renderResumoInventario();
+    renderTabelaInventario();
+  } else {
+    mostrarMensagem("Erro ao salvar conferência", "error");
+  }
+}
+
+async function initInventarioPage() {
+  await carregarInventarioTrimestral();
+  renderResumoInventario();
+  renderTabelaInventario();
+}
 // ============================================
 // EXPORTAÇÃO
 // ============================================
