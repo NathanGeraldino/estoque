@@ -576,3 +576,30 @@ tbody tr:hover {
 .hidden {
   display: none;
 }
+
+---
+
+body[data-page="inventario"] .page-header h1,
+body[data-page="inventario"] .page-header p {
+  color: #ffffff;
+}
+
+body[data-page="inventario"] .card {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 24px;
+  padding: 24px;
+  margin-top: 24px;
+}
+
+body[data-page="inventario"] .card h2 {
+  color: #0f172a;
+}
+
+body[data-page="inventario"] .card p {
+  color: #64748b;
+}
+
+body[data-page="inventario"] table {
+  color: #0f172a;
+}
