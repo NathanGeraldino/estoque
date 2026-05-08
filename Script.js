@@ -1755,7 +1755,347 @@ function exportarPDF() {
 
   mostrarMensagem('PDF exportado com sucesso!');
 }
+// ============================================
+// INVENTÁRIO TRIMESTRAL
+// ============================================
 
+let inventarioTrimestral = [];
+
+function obterTrimestreAtual() {
+  const agora = new Date();
+  const ano = agora.getFullYear();
+  const mes = agora.getMonth() + 1;
+
+  const trimestre = Math.ceil(mes / 3);
+
+  return `${ano}-T${trimestre}`;
+}
+
+async function carregarInventarioTrimestral() {
+  if (!supabaseClient) return;
+
+  try {
+    const trimestreAtual = obterTrimestreAtual();
+
+    const { data, error } = await supabaseClient
+      .from("inventario_trimestral")
+      .select("*")
+      .eq("trimestre", trimestreAtual)
+      .order("id", { ascending: true });
+
+    if (error) throw error;
+
+    inventarioTrimestral = data || [];
+
+  } catch (error) {
+    console.error("Erro ao carregar inventário:", error);
+  }
+}
+
+function obterRegistroInventario(produtoId) {
+  return inventarioTrimestral.find(
+    (item) => String(item.equipamento_id) === String(produtoId)
+  );
+}
+
+function calcularSituacaoInventario(qtdSistema, qtdConferida) {
+
+  if (
+    qtdConferida === "" ||
+    qtdConferida === null ||
+    qtdConferida === undefined
+  ) {
+    return "pendente";
+  }
+
+  return Number(qtdSistema) === Number(qtdConferida)
+    ? "ok"
+    : "divergente";
+}
+
+async function salvarConferenciaInventario(dados) {
+
+  try {
+
+    if (dados.id) {
+
+      const { data, error } = await supabaseClient
+        .from("inventario_trimestral")
+        .update(dados)
+        .eq("id", dados.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    }
+
+    const { data, error } = await supabaseClient
+      .from("inventario_trimestral")
+      .insert([dados])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
+
+  } catch (error) {
+    console.error("Erro ao salvar conferência:", error);
+    return null;
+  }
+}
+
+function renderResumoInventario() {
+
+  const container = document.getElementById("resumoInventario");
+
+  if (!container) return;
+
+  const total = produtos.length;
+
+  const conferidos = inventarioTrimestral.filter(
+    (item) =>
+      item.situacao === "ok" ||
+      item.situacao === "divergente"
+  ).length;
+
+  const divergentes = inventarioTrimestral.filter(
+    (item) => item.situacao === "divergente"
+  ).length;
+
+  const pendentes = total - conferidos;
+
+  container.innerHTML = `
+    <div class="small-card">
+      <p>Trimestre Atual</p>
+      <h3>${obterTrimestreAtual()}</h3>
+    </div>
+
+    <div class="small-card">
+      <p>Total Equipamentos</p>
+      <h3>${total}</h3>
+    </div>
+
+    <div class="small-card">
+      <p>Conferidos</p>
+      <h3>${conferidos}</h3>
+    </div>
+
+    <div class="small-card">
+      <p>Pendentes</p>
+      <h3>${pendentes}</h3>
+    </div>
+
+    <div class="small-card">
+      <p>Divergentes</p>
+      <h3>${divergentes}</h3>
+    </div>
+  `;
+}
+
+function renderTabelaInventario() {
+
+  const container = document.getElementById("tabelaInventario");
+
+  if (!container) return;
+
+  if (!produtos.length) {
+
+    container.innerHTML = `
+      <div class="empty">
+        Nenhum equipamento cadastrado.
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Equipamento</th>
+            <th>Modelo</th>
+            <th>Sistema</th>
+            <th>Conferido</th>
+            <th>Status</th>
+            <th>Responsável</th>
+            <th>Observação</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          ${produtos.map((produto) => {
+
+            const registro = obterRegistroInventario(produto.id);
+
+            const qtdConferida =
+              registro?.quantidade_conferida ?? "";
+
+            const situacao =
+              registro?.situacao || "pendente";
+
+            return `
+
+              <tr>
+
+                <td>${produto.id}</td>
+
+                <td class="produto-nome">
+                  ${produto.nome}
+                </td>
+
+                <td>${produto.modelo || "-"}</td>
+
+                <td>${produto.quantidade}</td>
+
+                <td>
+                  <input
+                    type="number"
+                    id="qtd_${produto.id}"
+                    class="input-table"
+                    value="${qtdConferida}"
+                    min="0"
+                  >
+                </td>
+
+                <td>
+                  <span class="status ${
+                    situacao === "ok"
+                      ? "ok"
+                      : situacao === "divergente"
+                      ? "low"
+                      : "warning"
+                  }">
+
+                    ${
+                      situacao === "ok"
+                        ? "OK"
+                        : situacao === "divergente"
+                        ? "Divergente"
+                        : "Pendente"
+                    }
+
+                  </span>
+                </td>
+
+                <td>
+                  <input
+                    type="text"
+                    id="resp_${produto.id}"
+                    class="input-table"
+                    value="${registro?.responsavel || ""}"
+                    placeholder="Responsável"
+                  >
+                </td>
+
+                <td>
+                  <input
+                    type="text"
+                    id="obs_${produto.id}"
+                    class="input-table"
+                    value="${registro?.observacao || ""}"
+                    placeholder="Observação"
+                  >
+                </td>
+
+                <td>
+                  <button
+                    class="btn btn-primary"
+                    onclick="salvarInventario('${produto.id}')"
+                  >
+                    Salvar
+                  </button>
+                </td>
+
+              </tr>
+            `;
+
+          }).join("")}
+
+        </tbody>
+
+      </table>
+
+    </div>
+  `;
+}
+
+async function salvarInventario(produtoId) {
+
+  const produto = produtos.find(
+    (p) => String(p.id) === String(produtoId)
+  );
+
+  if (!produto) return;
+
+  const registro = obterRegistroInventario(produtoId);
+
+  const qtd = document.getElementById(`qtd_${produtoId}`).value;
+
+  const responsavel =
+    document.getElementById(`resp_${produtoId}`).value;
+
+  const observacao =
+    document.getElementById(`obs_${produtoId}`).value;
+
+  const situacao = calcularSituacaoInventario(
+    produto.quantidade,
+    qtd
+  );
+
+  const dados = {
+    id: registro?.id || null,
+    equipamento_id: produto.id,
+    equipamento_nome: produto.nome,
+    modelo: produto.modelo || "",
+    quantidade_sistema: produto.quantidade,
+    quantidade_conferida: Number(qtd),
+    situacao,
+    responsavel,
+    observacao,
+    trimestre: obterTrimestreAtual(),
+    data_conferencia: new Date().toISOString()
+  };
+
+  const resultado =
+    await salvarConferenciaInventario(dados);
+
+  if (resultado) {
+
+    mostrarMensagem("Inventário salvo!");
+
+    await carregarInventarioTrimestral();
+
+    renderResumoInventario();
+
+    renderTabelaInventario();
+
+  } else {
+
+    mostrarMensagem(
+      "Erro ao salvar inventário",
+      "error"
+    );
+  }
+}
+
+async function initInventarioPage() {
+
+  await carregarInventarioTrimestral();
+
+  renderResumoInventario();
+
+  renderTabelaInventario();
+}
 // ============================================
 // REFRESH E INICIALIZAÇÃO
 // ============================================
@@ -1838,6 +2178,10 @@ document.addEventListener("DOMContentLoaded", async function () {
   if (pagina === "relatorios") {
     initRelatoriosPage();
   }
+
+  if (pagina === "inventario") {
+  initInventarioPage();
+}
 
   ativarRealtime();
 });
