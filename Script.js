@@ -2050,7 +2050,7 @@ async function salvarInventario(produtoId) {
     qtd
   );
 
-  cconst dados = {
+  const dados = {
   equipamento_id: produto.id,
   equipamento_nome: produto.nome,
   modelo: produto.modelo || "",
