@@ -2106,65 +2106,67 @@ async function initInventarioPage() {
 }
 
 function exportarInventarioExcel() {
-
   if (!produtos.length) {
-
-    mostrarMensagem(
-      "Nenhum equipamento encontrado",
-      "warning"
-    );
-
+    mostrarMensagem("Nenhum equipamento encontrado", "warning");
     return;
   }
 
+  const total = produtos.length;
+
+  const conferidos = inventarioTrimestral.filter(
+    (item) => item.situacao === "ok" || item.situacao === "divergente"
+  ).length;
+
+  const divergentes = inventarioTrimestral.filter(
+    (item) => item.situacao === "divergente"
+  ).length;
+
+  const pendentes = total - conferidos;
+
+  const conformidade = total > 0
+    ? ((conferidos - divergentes) / total) * 100
+    : 0;
+
+  const resumo = [
+    ["Relatório de Inventário Trimestral", ""],
+    ["Trimestre", obterTrimestreAtual()],
+    ["Data de exportação", new Date().toLocaleString("pt-BR")],
+    ["", ""],
+    ["Indicador", "Valor"],
+    ["Total de Equipamentos", total],
+    ["Conferidos", conferidos],
+    ["Pendentes", pendentes],
+    ["Divergentes", divergentes],
+    ["Conformidade", `${conformidade.toFixed(2)}%`]
+  ];
+
   const dados = produtos.map((produto) => {
+    const registro = obterRegistroInventario(produto.id);
 
-    const registro =
-      obterRegistroInventario(produto.id);
-
-    const qtdSistema =
-      Number(produto.quantidade);
-
-    const qtdConferida =
-      Number(registro?.quantidade_conferida ?? 0);
-
-    const diferenca =
-      qtdConferida - qtdSistema;
+    const qtdSistema = Number(produto.quantidade);
+    const qtdConferida = registro?.quantidade_conferida;
+    const diferenca = registro ? Number(qtdConferida) - qtdSistema : "-";
 
     return {
-
       ID: produto.id,
-
       Equipamento: produto.nome,
-
       Modelo: produto.modelo || "-",
-
-      "Qtd Sistema":
-        qtdSistema,
-
-      "Qtd Conferida":
-        registro?.quantidade_conferida ?? "-",
-
-      Diferença:
-        registro
-          ? diferenca
-          : "-",
-
-      Status:
-        registro?.situacao || "pendente",
-
-      Responsável:
-        registro?.responsavel || "-",
-
-      Observação:
-        registro?.observacao || "-"
+      "Qtd Sistema": qtdSistema,
+      "Qtd Conferida": registro ? qtdConferida : "-",
+      Diferença: diferenca,
+      Status: registro?.situacao || "pendente",
+      Responsável: registro?.responsavel || "-",
+      Observação: registro?.observacao || "-"
     };
   });
 
-  const ws =
-    XLSX.utils.json_to_sheet(dados);
+  const wb = XLSX.utils.book_new();
 
-  ws["!cols"] = [
+  const wsResumo = XLSX.utils.aoa_to_sheet(resumo);
+  wsResumo["!cols"] = [{ wch: 32 }, { wch: 25 }];
+
+  const wsInventario = XLSX.utils.json_to_sheet(dados);
+  wsInventario["!cols"] = [
     { wch: 8 },
     { wch: 35 },
     { wch: 25 },
@@ -2173,26 +2175,18 @@ function exportarInventarioExcel() {
     { wch: 12 },
     { wch: 18 },
     { wch: 25 },
-    { wch: 40 }
+    { wch: 45 }
   ];
 
-  const wb =
-    XLSX.utils.book_new();
-
-  XLSX.utils.book_append_sheet(
-    wb,
-    ws,
-    "Inventário"
-  );
+  XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo Executivo");
+  XLSX.utils.book_append_sheet(wb, wsInventario, "Inventário Completo");
 
   XLSX.writeFile(
     wb,
-    `Inventario_${obterTrimestreAtual()}.xlsx`
+    `Relatorio_Inventario_${obterTrimestreAtual()}.xlsx`
   );
 
-  mostrarMensagem(
-    "Inventário exportado!"
-  );
+  mostrarMensagem("Relatório trimestral exportado!");
 }
 // ============================================
 // REFRESH E INICIALIZAÇÃO
