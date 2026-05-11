@@ -2106,6 +2106,7 @@ async function initInventarioPage() {
 }
 
 function exportarInventarioExcel() {
+
   if (!produtos.length) {
     mostrarMensagem("Nenhum equipamento encontrado", "warning");
     return;
@@ -2114,11 +2115,12 @@ function exportarInventarioExcel() {
   const total = produtos.length;
 
   const conferidos = inventarioTrimestral.filter(
-    (item) => item.situacao === "ok" || item.situacao === "divergente"
+    item => item.situacao === "ok" ||
+            item.situacao === "divergente"
   ).length;
 
   const divergentes = inventarioTrimestral.filter(
-    (item) => item.situacao === "divergente"
+    item => item.situacao === "divergente"
   ).length;
 
   const pendentes = total - conferidos;
@@ -2127,12 +2129,19 @@ function exportarInventarioExcel() {
     ? ((conferidos - divergentes) / total) * 100
     : 0;
 
+  const wb = XLSX.utils.book_new();
+
+  // ==========================================
+  // RESUMO EXECUTIVO
+  // ==========================================
+
   const resumo = [
-    ["Relatório de Inventário Trimestral", ""],
+    ["RELATÓRIO DE INVENTÁRIO TRIMESTRAL"],
+    [],
     ["Trimestre", obterTrimestreAtual()],
-    ["Data de exportação", new Date().toLocaleString("pt-BR")],
-    ["", ""],
-    ["Indicador", "Valor"],
+    ["Data de Exportação", new Date().toLocaleString("pt-BR")],
+    [],
+    ["INDICADOR", "VALOR"],
     ["Total de Equipamentos", total],
     ["Conferidos", conferidos],
     ["Pendentes", pendentes],
@@ -2140,53 +2149,116 @@ function exportarInventarioExcel() {
     ["Conformidade", `${conformidade.toFixed(2)}%`]
   ];
 
-  const dados = produtos.map((produto) => {
-    const registro = obterRegistroInventario(produto.id);
+  const wsResumo = XLSX.utils.aoa_to_sheet(resumo);
 
-    const qtdSistema = Number(produto.quantidade);
-    const qtdConferida = registro?.quantidade_conferida;
-    const diferenca = registro ? Number(qtdConferida) - qtdSistema : "-";
+  wsResumo["!cols"] = [
+    { wch: 35 },
+    { wch: 20 }
+  ];
+
+  // ==========================================
+  // INVENTÁRIO COMPLETO
+  // ==========================================
+
+  const dados = produtos.map((produto) => {
+
+    const registro =
+      obterRegistroInventario(produto.id);
+
+    const qtdSistema =
+      Number(produto.quantidade);
+
+    const qtdConferida =
+      registro?.quantidade_conferida ?? "-";
+
+    const diferenca =
+      registro
+        ? Number(qtdConferida) - qtdSistema
+        : "-";
 
     return {
       ID: produto.id,
       Equipamento: produto.nome,
       Modelo: produto.modelo || "-",
       "Qtd Sistema": qtdSistema,
-      "Qtd Conferida": registro ? qtdConferida : "-",
+      "Qtd Conferida": qtdConferida,
       Diferença: diferenca,
-      Status: registro?.situacao || "pendente",
-      Responsável: registro?.responsavel || "-",
-      Observação: registro?.observacao || "-"
+
+      Status:
+        registro?.situacao === "ok"
+          ? "OK"
+          : registro?.situacao === "divergente"
+          ? "DIVERGENTE"
+          : "PENDENTE",
+
+      Responsável:
+        registro?.responsavel || "-",
+
+      Observação:
+        registro?.observacao || "-"
     };
   });
 
-  const wb = XLSX.utils.book_new();
+  const wsInventario =
+    XLSX.utils.json_to_sheet(dados);
 
-  const wsResumo = XLSX.utils.aoa_to_sheet(resumo);
-  wsResumo["!cols"] = [{ wch: 32 }, { wch: 25 }];
-
-  const wsInventario = XLSX.utils.json_to_sheet(dados);
   wsInventario["!cols"] = [
     { wch: 8 },
     { wch: 35 },
     { wch: 25 },
     { wch: 15 },
+    { wch: 18 },
     { wch: 15 },
-    { wch: 12 },
     { wch: 18 },
     { wch: 25 },
     { wch: 45 }
   ];
 
-  XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo Executivo");
-  XLSX.utils.book_append_sheet(wb, wsInventario, "Inventário Completo");
+  // ==========================================
+  // ESTILIZAÇÃO BÁSICA
+  // ==========================================
+
+  // Título
+  wsResumo["A1"].s = {
+    font: {
+      bold: true,
+      sz: 16
+    }
+  };
+
+  // Cabeçalhos
+  ["A6", "B6"].forEach(cell => {
+    if (wsResumo[cell]) {
+      wsResumo[cell].s = {
+        font: { bold: true }
+      };
+    }
+  });
+
+  // ==========================================
+  // ADICIONA ABAS
+  // ==========================================
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    wsResumo,
+    "Resumo Executivo"
+  );
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    wsInventario,
+    "Inventário Completo"
+  );
 
   XLSX.writeFile(
     wb,
     `Relatorio_Inventario_${obterTrimestreAtual()}.xlsx`
   );
 
-  mostrarMensagem("Relatório trimestral exportado!");
+  mostrarMensagem(
+    "Relatório executivo exportado!"
+  );
 }
 // ============================================
 // REFRESH E INICIALIZAÇÃO
