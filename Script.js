@@ -2096,6 +2096,103 @@ async function initInventarioPage() {
   renderResumoInventario();
 
   renderTabelaInventario();
+
+  document
+    .getElementById("exportarInventario")
+    ?.addEventListener(
+      "click",
+      exportarInventarioExcel
+    );
+}
+
+function exportarInventarioExcel() {
+
+  if (!produtos.length) {
+
+    mostrarMensagem(
+      "Nenhum equipamento encontrado",
+      "warning"
+    );
+
+    return;
+  }
+
+  const dados = produtos.map((produto) => {
+
+    const registro =
+      obterRegistroInventario(produto.id);
+
+    const qtdSistema =
+      Number(produto.quantidade);
+
+    const qtdConferida =
+      Number(registro?.quantidade_conferida ?? 0);
+
+    const diferenca =
+      qtdConferida - qtdSistema;
+
+    return {
+
+      ID: produto.id,
+
+      Equipamento: produto.nome,
+
+      Modelo: produto.modelo || "-",
+
+      "Qtd Sistema":
+        qtdSistema,
+
+      "Qtd Conferida":
+        registro?.quantidade_conferida ?? "-",
+
+      Diferença:
+        registro
+          ? diferenca
+          : "-",
+
+      Status:
+        registro?.situacao || "pendente",
+
+      Responsável:
+        registro?.responsavel || "-",
+
+      Observação:
+        registro?.observacao || "-"
+    };
+  });
+
+  const ws =
+    XLSX.utils.json_to_sheet(dados);
+
+  ws["!cols"] = [
+    { wch: 8 },
+    { wch: 35 },
+    { wch: 25 },
+    { wch: 15 },
+    { wch: 15 },
+    { wch: 12 },
+    { wch: 18 },
+    { wch: 25 },
+    { wch: 40 }
+  ];
+
+  const wb =
+    XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    ws,
+    "Inventário"
+  );
+
+  XLSX.writeFile(
+    wb,
+    `Inventario_${obterTrimestreAtual()}.xlsx`
+  );
+
+  mostrarMensagem(
+    "Inventário exportado!"
+  );
 }
 // ============================================
 // REFRESH E INICIALIZAÇÃO
