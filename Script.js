@@ -2050,19 +2050,22 @@ async function salvarInventario(produtoId) {
     qtd
   );
 
-  const dados = {
-    id: registro?.id || null,
-    equipamento_id: produto.id,
-    equipamento_nome: produto.nome,
-    modelo: produto.modelo || "",
-    quantidade_sistema: produto.quantidade,
-    quantidade_conferida: Number(qtd),
-    situacao,
-    responsavel,
-    observacao,
-    trimestre: obterTrimestreAtual(),
-    data_conferencia: new Date().toISOString()
-  };
+  cconst dados = {
+  equipamento_id: produto.id,
+  equipamento_nome: produto.nome,
+  modelo: produto.modelo || "",
+  quantidade_sistema: produto.quantidade,
+  quantidade_conferida: Number(qtd),
+  situacao,
+  responsavel,
+  observacao,
+  trimestre: obterTrimestreAtual(),
+  data_conferencia: new Date().toISOString()
+};
+
+if (registro?.id) {
+  dados.id = registro.id;
+}
 
   const resultado =
     await salvarConferenciaInventario(dados);
