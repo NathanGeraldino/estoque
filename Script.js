@@ -1030,7 +1030,9 @@ function renderSelectProdutosMov() {
   select.innerHTML = produtos
     .map(
       (item) =>
-        `<option value="${item.id}">${item.nome} (${item.quantidade} em estoque)</option>`
+        `<option value="${item.id}">
+          ${item.nome} - ${item.modelo || "Sem modelo"} (${item.quantidade} em estoque)
+        </option>`
     )
     .join("");
 }
