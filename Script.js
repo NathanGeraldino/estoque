@@ -1242,15 +1242,78 @@ function initMovimentacoesPage() {
     let sucesso = false;
 
     if (editandoMovimentacaoId) {
-      // Atualizar movimentação existente
-      const resultado = await atualizarMovimentacaoDB(editandoMovimentacaoId, {
-        produtoId,
-        tipo,
-        quantidade,
-        observacao
-      });
-      sucesso = resultado !== null;
-    } else {
+  const movAntiga = movimentacoes.find(
+    (m) => String(m.id) === String(editandoMovimentacaoId)
+  );
+
+  if (!movAntiga) {
+    mostrarMensagem("Movimentação antiga não encontrada", "error");
+    return;
+  }
+
+  const produtoAntigo = produtos.find(
+    (p) => String(p.id) === String(movAntiga.produtoId)
+  );
+
+  const produtoNovo = produtos.find(
+    (p) => String(p.id) === String(produtoId)
+  );
+
+  if (!produtoAntigo || !produtoNovo) {
+    mostrarMensagem("Equipamento não encontrado", "error");
+    return;
+  }
+
+  let estoqueProdutoAntigo = Number(produtoAntigo.quantidade);
+
+  if (movAntiga.tipo === "entrada") {
+    estoqueProdutoAntigo -= Number(movAntiga.quantidade);
+  } else if (movAntiga.tipo === "saida") {
+    estoqueProdutoAntigo += Number(movAntiga.quantidade);
+  }
+
+  if (String(produtoAntigo.id) === String(produtoNovo.id)) {
+    let novoEstoque = estoqueProdutoAntigo;
+
+    if (tipo === "entrada") {
+      novoEstoque += Number(quantidade);
+    } else if (tipo === "saida") {
+      novoEstoque -= Number(quantidade);
+    }
+
+    if (novoEstoque < 0) {
+      mostrarMensagem("A edição deixaria o estoque negativo.", "error");
+      return;
+    }
+
+    await atualizarQuantidadeProduto(produtoNovo.id, novoEstoque);
+  } else {
+    let estoqueNovoProduto = Number(produtoNovo.quantidade);
+
+    if (tipo === "entrada") {
+      estoqueNovoProduto += Number(quantidade);
+    } else if (tipo === "saida") {
+      estoqueNovoProduto -= Number(quantidade);
+    }
+
+    if (estoqueProdutoAntigo < 0 || estoqueNovoProduto < 0) {
+      mostrarMensagem("A edição deixaria um estoque negativo.", "error");
+      return;
+    }
+
+    await atualizarQuantidadeProduto(produtoAntigo.id, estoqueProdutoAntigo);
+    await atualizarQuantidadeProduto(produtoNovo.id, estoqueNovoProduto);
+  }
+
+  const resultado = await atualizarMovimentacaoDB(editandoMovimentacaoId, {
+    produtoId,
+    tipo,
+    quantidade,
+    observacao
+  });
+
+  sucesso = resultado !== null;
+} else {
       // Nova movimentação
       sucesso = await registrarMovimentacao(produtoId, tipo, quantidade, observacao);
     }
