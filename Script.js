@@ -1083,10 +1083,40 @@ function renderTabelaMovimentacoes() {
 
   if (!container) return;
 
-  const lista =
-    [...movimentacoes].sort(
-      (a, b) => new Date(b.data) - new Date(a.data)
-    );
+  const dataInicial =
+  document.getElementById("filtroDataInicial")?.value || "";
+
+const dataFinal =
+  document.getElementById("filtroDataFinal")?.value || "";
+
+const produtoFiltro =
+  document.getElementById("filtroProdutoMov")?.value || "";
+
+let lista = [...movimentacoes];
+
+lista.sort(
+  (a, b) => new Date(b.dataISO) - new Date(a.dataISO)
+);
+
+lista = lista.filter((mov) => {
+  const dataMov = mov.dataFiltro || "";
+
+  const atendeDataInicial =
+    !dataInicial || dataMov >= dataInicial;
+
+  const atendeDataFinal =
+    !dataFinal || dataMov <= dataFinal;
+
+  const atendeProduto =
+    !produtoFiltro ||
+    String(mov.produtoId) === String(produtoFiltro);
+
+  return (
+    atendeDataInicial &&
+    atendeDataFinal &&
+    atendeProduto
+  );
+});
 
   if (!lista.length) {
     container.innerHTML = `
@@ -1402,15 +1432,20 @@ function initMovimentacoesPage() {
     mostrarLoading(false);
   });
 
-  filtroDataInicial?.addEventListener("change", renderTabelaMovimentacoes);
-  filtroDataFinal?.addEventListener("change", renderTabelaMovimentacoes);
-  filtroProdutoMov?.addEventListener("change", renderTabelaMovimentacoes);
-  cancelarEdicaoBtn?.addEventListener("click", cancelarEdicaoMovimentacao);
-
-  renderSelectProdutosMov();
-  renderFiltroProdutosMov();
+  filtroDataInicial?.addEventListener("change", () => {
+  paginaMovimentacoes = 1;
   renderTabelaMovimentacoes();
-}
+});
+
+filtroDataFinal?.addEventListener("change", () => {
+  paginaMovimentacoes = 1;
+  renderTabelaMovimentacoes();
+});
+
+filtroProdutoMov?.addEventListener("change", () => {
+  paginaMovimentacoes = 1;
+  renderTabelaMovimentacoes();
+});
 
 // ============================================
 // ALOCAÇÕES
