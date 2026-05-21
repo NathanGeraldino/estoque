@@ -1324,6 +1324,7 @@ function initMovimentacoesPage() {
   const filtroDataFinal = document.getElementById("filtroDataFinal");
   const filtroProdutoMov = document.getElementById("filtroProdutoMov");
   const cancelarEdicaoBtn = document.getElementById("cancelarEdicaoMov");
+  const limparFiltrosMov = document.getElementById("limparFiltrosMov");
 
   if (!form) return;
 
@@ -1336,6 +1337,7 @@ function initMovimentacoesPage() {
     const tipo = document.getElementById("tipoMov").value;
     const quantidade = Number(document.getElementById("quantidadeMov").value);
     const observacao = document.getElementById("obsMov").value;
+    
 
     console.log("📦 Dados:", { produtoId, tipo, quantidade, observacao });
 
@@ -1447,6 +1449,15 @@ filtroDataFinal?.addEventListener("change", () => {
 });
 
 filtroProdutoMov?.addEventListener("change", () => {
+  paginaMovimentacoes = 1;
+  renderTabelaMovimentacoes();
+});
+
+  limparFiltrosMov?.addEventListener("click", () => {
+  document.getElementById("filtroDataInicial").value = "";
+  document.getElementById("filtroDataFinal").value = "";
+  document.getElementById("filtroProdutoMov").value = "";
+
   paginaMovimentacoes = 1;
   renderTabelaMovimentacoes();
 });
