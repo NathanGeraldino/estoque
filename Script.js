@@ -1077,39 +1077,43 @@ async function registrarMovimentacao(produtoId, tipo, quantidade, observacao = "
 }
 
 function renderTabelaMovimentacoes() {
-  const container = document.getElementById("tabelaMovimentacoes");
+
+  const container =
+    document.getElementById("tabelaMovimentacoes");
+
   if (!container) return;
 
-  const dataInicial = document.getElementById("filtroDataInicial")?.value || "";
-  const dataFinal = document.getElementById("filtroDataFinal")?.value || "";
-  const produtoFiltro = document.getElementById("filtroProdutoMov")?.value || "";
-
-  let lista = [...movimentacoes];
-
-  lista.sort((a, b) => new Date(b.dataISO) - new Date(a.dataISO));
-
-  lista = lista.filter((mov) => {
-    const dataMov = mov.dataFiltro || "";
-    const atendeDataInicial = !dataInicial || dataMov >= dataInicial;
-    const atendeDataFinal = !dataFinal || dataMov <= dataFinal;
-    const atendeProduto = !produtoFiltro || String(mov.produtoId) === String(produtoFiltro);
-    const totalPaginas = Math.ceil(lista.length / itensPorPaginaMov);
-    const inicio = (paginaMovimentacoes - 1) * itensPorPaginaMov;
-    const fim = inicio + itensPorPaginaMov;
-
-    const listaPaginada = lista.slice(inicio, fim);
-
-    return atendeDataInicial && atendeDataFinal && atendeProduto;
-  });
+  const lista =
+    [...movimentacoes].sort(
+      (a, b) => new Date(b.data) - new Date(a.data)
+    );
 
   if (!lista.length) {
-    container.innerHTML = `<div class="empty">Nenhuma movimentação encontrada com os filtros aplicados.</div>`;
+    container.innerHTML = `
+      <div class="empty">
+        Nenhuma movimentação registrada.
+      </div>
+    `;
     return;
   }
 
+  const totalPaginas =
+    Math.ceil(lista.length / itensPorPaginaMov);
+
+  const inicio =
+    (paginaMovimentacoes - 1) * itensPorPaginaMov;
+
+  const fim =
+    inicio + itensPorPaginaMov;
+
+  const listaPaginada =
+    lista.slice(inicio, fim);
+
   container.innerHTML = `
     <div class="table-wrapper">
+
       <table>
+
         <thead>
           <tr>
             <th>Data</th>
@@ -1121,75 +1125,107 @@ function renderTabelaMovimentacoes() {
             <th>Ações</th>
           </tr>
         </thead>
+
         <tbody>
+
           ${listaPaginada.map((mov) => `
+
             <tr>
+
               <td>${mov.data}</td>
+
               <td>${mov.produtoId}</td>
-              <td class="produto-nome">${mov.produtoNome}</td>
+
+              <td class="produto-nome">
+                ${mov.produtoNome}
+              </td>
+
               <td>
                 <span class="status ${
-  mov.tipo === "entrada"
-    ? "ok"
-    : mov.tipo === "saida"
-    ? "low"
-    : "warning"
-}">
-  ${
-    mov.tipo === "entrada"
-      ? "Entrada"
-      : mov.tipo === "saida"
-      ? "Saída"
-      : mov.tipo === "edicao"
-      ? "Edição"
-      : "Exclusão"
-  }
-</span>
+                  mov.tipo === "entrada"
+                    ? "ok"
+                    : mov.tipo === "saida"
+                    ? "low"
+                    : "warning"
+                }">
+
+                  ${
+                    mov.tipo === "entrada"
+                      ? "Entrada"
+                      : mov.tipo === "saida"
+                      ? "Saída"
+                      : mov.tipo === "edicao"
+                      ? "Edição"
+                      : "Exclusão"
+                  }
+
+                </span>
               </td>
+
               <td>${mov.quantidade}</td>
-              <td>${mov.observacao || "-"}</td>
+
               <td>
-              <button class="btn btn-secondary" onclick="editarMovimentacao('${mov.id}')">
-                 Editar
-               </button>
-               <button class="btn btn-secondary" onclick="excluirMovimentacao('${mov.id}')">
-                 Excluir
-               </button>
-            </td>
+                ${mov.observacao || "-"}
+              </td>
+
+              <td>
+
+                <button
+                  class="btn btn-secondary"
+                  onclick="editarMovimentacao('${mov.id}')"
+                >
+                  Editar
+                </button>
+
+                <button
+                  class="btn btn-secondary"
+                  onclick="excluirMovimentacao('${mov.id}')"
+                >
+                  Excluir
+                </button>
+
+              </td>
+
             </tr>
+
           `).join("")}
+
         </tbody>
+
       </table>
+
     </div>
 
     <div class="pagination">
 
-    <button
-      class="btn btn-secondary"
-      onclick="mudarPaginaMovimentacoes(-1)"
-      ${paginaMovimentacoes <= 1 ? "disabled" : ""}
-    >
-      Anterior
-    </button>
+      <button
+        class="btn btn-secondary"
+        onclick="mudarPaginaMovimentacoes(-1)"
+        ${paginaMovimentacoes <= 1 ? "disabled" : ""}
+      >
+        Anterior
+      </button>
 
-    <span>
-      Página ${paginaMovimentacoes} de ${totalPaginas}
-    </span>
+      <span>
+        Página ${paginaMovimentacoes} de ${totalPaginas}
+      </span>
 
-    <button
-      class="btn btn-secondary"
-      onclick="mudarPaginaMovimentacoes(1)"
-      ${paginaMovimentacoes >= totalPaginas ? "disabled" : ""}
-    >
-      Próxima
-    </button>
+      <button
+        class="btn btn-secondary"
+        onclick="mudarPaginaMovimentacoes(1)"
+        ${paginaMovimentacoes >= totalPaginas ? "disabled" : ""}
+      >
+        Próxima
+      </button>
 
-  </div>
+    </div>
   `;
 }
 
 function mudarPaginaMovimentacoes(direcao) {
+
   paginaMovimentacoes += direcao;
+
   renderTabelaMovimentacoes();
 }
 
