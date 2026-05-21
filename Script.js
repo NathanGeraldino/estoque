@@ -1451,6 +1451,14 @@ filtroProdutoMov?.addEventListener("change", () => {
   renderTabelaMovimentacoes();
 });
 
+cancelarEdicaoBtn?.addEventListener("click", cancelarEdicaoMovimentacao);
+
+renderSelectProdutosMov();
+renderFiltroProdutosMov();
+renderTabelaMovimentacoes();
+
+}
+
 // ============================================
 // ALOCAÇÕES
 // ============================================
