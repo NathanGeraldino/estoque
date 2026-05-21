@@ -20,6 +20,8 @@ let chartCategoriasInstance = null;
 let chartSaidasInstance = null;
 let chartMovimentacoesInstance = null;
 let editandoMovimentacaoId = null;
+let paginaMovimentacoes = 1;
+const itensPorPaginaMov = 10;
 
 // ============================================
 // INICIALIZAÇÃO DO SUPABASE
@@ -1091,6 +1093,11 @@ function renderTabelaMovimentacoes() {
     const atendeDataInicial = !dataInicial || dataMov >= dataInicial;
     const atendeDataFinal = !dataFinal || dataMov <= dataFinal;
     const atendeProduto = !produtoFiltro || String(mov.produtoId) === String(produtoFiltro);
+    const totalPaginas = Math.ceil(lista.length / itensPorPaginaMov);
+    const inicio = (paginaMovimentacoes - 1) * itensPorPaginaMov;
+    const fim = inicio + itensPorPaginaMov;
+
+    const listaPaginada = lista.slice(inicio, fim);
 
     return atendeDataInicial && atendeDataFinal && atendeProduto;
   });
@@ -1115,7 +1122,7 @@ function renderTabelaMovimentacoes() {
           </tr>
         </thead>
         <tbody>
-          ${lista.map((mov) => `
+          ${listaPaginada.map((mov) => `
             <tr>
               <td>${mov.data}</td>
               <td>${mov.produtoId}</td>
@@ -1154,7 +1161,36 @@ function renderTabelaMovimentacoes() {
         </tbody>
       </table>
     </div>
+
+    <div class="pagination">
+
+    <button
+      class="btn btn-secondary"
+      onclick="mudarPaginaMovimentacoes(-1)"
+      ${paginaMovimentacoes <= 1 ? "disabled" : ""}
+    >
+      Anterior
+    </button>
+
+    <span>
+      Página ${paginaMovimentacoes} de ${totalPaginas}
+    </span>
+
+    <button
+      class="btn btn-secondary"
+      onclick="mudarPaginaMovimentacoes(1)"
+      ${paginaMovimentacoes >= totalPaginas ? "disabled" : ""}
+    >
+      Próxima
+    </button>
+
+  </div>
   `;
+}
+
+function mudarPaginaMovimentacoes(direcao) {
+  paginaMovimentacoes += direcao;
+  renderTabelaMovimentacoes();
 }
 
 function renderFiltroProdutosMov() {
