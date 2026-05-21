@@ -1118,6 +1118,10 @@ lista = lista.filter((mov) => {
   );
 });
 
+  if (paginaMovimentacoes > Math.ceil(lista.length / itensPorPaginaMov)) {
+  paginaMovimentacoes = 1;
+}
+
   if (!lista.length) {
     container.innerHTML = `
       <div class="empty">
