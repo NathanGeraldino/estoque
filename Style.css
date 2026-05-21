@@ -668,3 +668,24 @@ body[data-page="inventario"] .produto-nome {
 body[data-page="inventario"] .table-wrapper {
   overflow-x: auto;
 }
+
+
+
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.pagination span {
+  font-weight: 600;
+  color: #64748b;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
