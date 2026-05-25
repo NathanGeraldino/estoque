@@ -689,3 +689,46 @@ body[data-page="inventario"] .table-wrapper {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.alerta-inventario {
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-left: 6px solid;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.alerta-inventario.pendente {
+  border-color: #f59e0b;
+  background: #fff8e6;
+}
+
+.alerta-inventario.andamento {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.alerta-inventario.concluido {
+  border-color: #22c55e;
+  background: #ecfdf5;
+}
+
+.alerta-inventario.atrasado {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.alerta-inventario h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.alerta-inventario p {
+  margin: 5px 0;
+  color: #475569;
+}
+
+.alerta-inventario button {
+  margin-top: 12px;
+}
