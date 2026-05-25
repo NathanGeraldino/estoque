@@ -2612,6 +2612,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   }
   
   await carregarDados();
+  await carregarInventarioTrimestral();
 
   atualizarMenuAtivo();
   refreshAll();
