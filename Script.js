@@ -2471,7 +2471,7 @@ function renderAlertaInventario() {
   const hoje = new Date();
   const mes = hoje.getMonth() + 1;
 
-  const mesesInventario = [3, 6, 9, 12];
+  const mesesInventario = [5];
 
   if (!mesesInventario.includes(mes)) {
     container.innerHTML = "";
