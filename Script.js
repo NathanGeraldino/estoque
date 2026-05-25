@@ -2459,6 +2459,101 @@ function exportarInventarioExcel() {
 // REFRESH E INICIALIZAÇÃO
 // ============================================
 
+function renderAlertaInventario() {
+
+  const container =
+    document.getElementById(
+      "alertaInventarioContainer"
+    );
+
+  if (!container) return;
+
+  const hoje = new Date();
+  const mes = hoje.getMonth() + 1;
+
+  const mesesInventario = [3, 6, 9, 12];
+
+  if (!mesesInventario.includes(mes)) {
+    container.innerHTML = "";
+    return;
+  }
+
+  const totalEquipamentos =
+    produtos.length;
+
+  const trimestreAtual =
+    obterTrimestreAtual();
+
+  const registrosTrimestre =
+    inventarioTrimestral.filter(
+      item =>
+        item.trimestre === trimestreAtual
+    );
+
+  const conferidos =
+    registrosTrimestre.length;
+
+  const percentual =
+    totalEquipamentos > 0
+      ? Math.round(
+          (conferidos /
+            totalEquipamentos) * 100
+        )
+      : 0;
+
+  let classe = "pendente";
+  let titulo =
+    "⚠️ Inventário Trimestral Pendente";
+  let texto =
+    `O inventário do ${trimestreAtual} ainda não foi iniciado.`;
+
+  if (
+    conferidos > 0 &&
+    conferidos < totalEquipamentos
+  ) {
+    classe = "andamento";
+
+    titulo =
+      "🟡 Inventário em andamento";
+
+    texto =
+      `${conferidos} de ${totalEquipamentos} equipamentos conferidos (${percentual}%).`;
+  }
+
+  if (
+    conferidos >= totalEquipamentos &&
+    totalEquipamentos > 0
+  ) {
+    classe = "concluido";
+
+    titulo =
+      "🟢 Inventário concluído";
+
+    texto =
+      `${conferidos} de ${totalEquipamentos} equipamentos conferidos.`;
+  }
+
+  container.innerHTML = `
+    <div class="alerta-inventario ${classe}">
+      <h3>${titulo}</h3>
+
+      <p>${texto}</p>
+
+      <p>
+        Trimestre:
+        <strong>${trimestreAtual}</strong>
+      </p>
+
+      <button
+        class="btn btn-primary"
+        onclick="window.location.href='inventario.html'"
+      >
+        Ir para Inventário
+      </button>
+    </div>
+  `;
+}
+
 function refreshAll() {
   atualizarCards();
   atualizarMenuAtivo();
@@ -2475,6 +2570,7 @@ function refreshAll() {
   renderRelatorioResumo();
   renderRelatorioCategorias();
   renderRelatorioMaiorSaida();
+  renderAlertaInventario();
 }
 function ativarRealtime() {
   if (!supabaseClient) return;
