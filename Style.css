@@ -173,6 +173,7 @@ body {
   display: grid;
   grid-template-columns: 360px 1fr;
   gap: 22px;
+  align-items: start;
 }
 
 .panel {
@@ -180,7 +181,6 @@ body {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
   padding: 22px;
-  align-items: start;
 }
 
 .margin-top {
