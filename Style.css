@@ -180,6 +180,7 @@ body {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow);
   padding: 22px;
+  align-items: start;
 }
 
 .margin-top {
