@@ -670,9 +670,6 @@ body[data-page="inventario"] .table-wrapper {
   overflow-x: auto;
 }
 
-
-
-
 .pagination {
   display: flex;
   align-items: center;
@@ -732,4 +729,42 @@ body[data-page="inventario"] .table-wrapper {
 
 .alerta-inventario button {
   margin-top: 12px;
+}
+
+
+
+
+
+.form-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+}
+
+.form-toggle h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.form-toggle p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+#toggleIcon {
+  font-size: 20px;
+  transition: transform .2s ease;
+}
+
+.form-collapsed #formEquipamentoContainer {
+  display: none;
+}
+
+.form-collapsed #toggleIcon {
+  transform: rotate(-90deg);
 }
