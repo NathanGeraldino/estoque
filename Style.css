@@ -768,3 +768,10 @@ body[data-page="inventario"] .table-wrapper {
 .form-collapsed #toggleIcon {
   transform: rotate(-90deg);
 }
+.form-panel.form-collapsed #formEquipamentoContainer {
+  display: none !important;
+}
+
+.form-panel.form-collapsed #toggleIcon {
+  transform: rotate(-90deg);
+}
