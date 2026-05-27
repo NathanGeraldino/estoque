@@ -91,7 +91,15 @@ async function carregarDados() {
     console.error('Erro ao carregar dados:', error);
   }
 }
+function toggleFormEquipamento() {
 
+  const painel =
+    document.querySelector(".form-panel");
+
+  painel.classList.toggle(
+    "form-collapsed"
+  );
+}
 async function salvarProduto(produto) {
   if (!supabaseClient) return null;
 
