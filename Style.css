@@ -274,10 +274,6 @@ body {
   background: var(--secondary-hover);
 }
 
-exportarInventario{
-  margin-bottom: 20px;
-}
-
 .table-header {
   display: flex;
   justify-content: space-between;
