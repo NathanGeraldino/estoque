@@ -2346,10 +2346,58 @@ function exportarInventarioExcel() {
 
   const wsResumo = XLSX.utils.aoa_to_sheet(resumo);
 
-  wsResumo["!cols"] = [
-    { wch: 35 },
-    { wch: 20 }
-  ];
+wsResumo["!cols"] = [
+  { wch: 38 },
+  { wch: 22 }
+];
+
+wsResumo["!merges"] = [
+  { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }
+];
+
+wsResumo["A1"].s = {
+  font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
+  fill: { fgColor: { rgb: "0D2ED3" } },
+  alignment: { horizontal: "center", vertical: "center" }
+};
+
+wsResumo["A6"].s = {
+  font: { bold: true, color: { rgb: "FFFFFF" } },
+  fill: { fgColor: { rgb: "0D2ED3" } },
+  alignment: { horizontal: "center" }
+};
+
+wsResumo["B6"].s = {
+  font: { bold: true, color: { rgb: "FFFFFF" } },
+  fill: { fgColor: { rgb: "0D2ED3" } },
+  alignment: { horizontal: "center" }
+};
+
+for (let i = 7; i <= 11; i++) {
+  const cellA = `A${i}`;
+  const cellB = `B${i}`;
+
+  if (wsResumo[cellA]) {
+    wsResumo[cellA].s = {
+      font: { bold: true },
+      fill: { fgColor: { rgb: "F3F6FB" } },
+      border: {
+        bottom: { style: "thin", color: { rgb: "D9E2EF" } }
+      }
+    };
+  }
+
+  if (wsResumo[cellB]) {
+    wsResumo[cellB].s = {
+      font: { bold: true },
+      alignment: { horizontal: "center" },
+      fill: { fgColor: { rgb: "FFFFFF" } },
+      border: {
+        bottom: { style: "thin", color: { rgb: "D9E2EF" } }
+      }
+    };
+  }
+}
 
   // ==========================================
   // INVENTÁRIO COMPLETO
