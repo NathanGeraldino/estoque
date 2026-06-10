@@ -54,15 +54,15 @@ async function carregarDados() {
 
     if (produtosError) throw produtosError;
     produtos = (produtosData || []).map(p => ({
-      id: p.id,
-      nome: p.nome,
-      modelo: p.categoria,
-      quantidade: p.quantidade,
-      minimo: p.quantidade_minima,
-      valor: p.preco,
-      descricao: p.descricao
-      prioridade: p.prioridade || "Média"
-    }));
+  id: p.id,
+  nome: p.nome,
+  modelo: p.categoria,
+  quantidade: p.quantidade,
+  minimo: p.quantidade_minima,
+  valor: p.preco,
+  descricao: p.descricao,
+  prioridade: p.prioridade || 'Média'
+}));
 
     // Carrega movimentações
     const { data: movData, error: movError } = await supabaseClient
