@@ -1728,7 +1728,7 @@ function renderAlertaCompras() {
   if (!container || !produtos.length) return;
 
   const itensCompra = produtos.filter(
-    produto => Number(produto.quantidade) <= Number(produto.minimo)
+    produto => Number(produto.quantidade) < Number(produto.minimo)
   );
 
   if (!itensCompra.length) {
