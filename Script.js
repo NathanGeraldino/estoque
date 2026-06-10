@@ -2525,12 +2525,12 @@ const impactoDivergencias = produtos.reduce((acc, produto) => {
   ];
 
   wsResumo["!merges"] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } },
-    { s: { r: 1, c: 0 }, e: { r: 1, c: 3 } },
-    { s: { r: 4, c: 1 }, e: { r: 4, c: 3 } },
-    { s: { r: 6, c: 0 }, e: { r: 6, c: 3 } },
-    { s: { r: 13, c: 0 }, e: { r: 13, c: 3 } }
-  ];
+  { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }, // linha 1
+  { s: { r: 1, c: 0 }, e: { r: 1, c: 3 } }, // linha 2
+  { s: { r: 4, c: 1 }, e: { r: 4, c: 3 } },
+  { s: { r: 6, c: 0 }, e: { r: 6, c: 3 } }, // linha 7
+  { s: { r: 14, c: 0 }, e: { r: 14, c: 3 } } // linha 15
+];
 
   wsResumo["A1"].s = {
     font: { bold: true, sz: 18, color: { rgb: "FFFFFF" } },
@@ -2539,14 +2539,8 @@ const impactoDivergencias = produtos.reduce((acc, produto) => {
   };
 
   wsResumo["A2"].s = {
-  font: {
-    bold: true,
-    sz: 14,
-    color: { rgb: "0D2ED3" }
-  },
-  alignment: {
-    horizontal: "left"
-  }
+  font: { bold: true, sz: 12, color: { rgb: "0D2ED3" } },
+  alignment: { horizontal: "center" }
 };
 
   ["A7", "A15"].forEach(cell => {
@@ -2559,7 +2553,7 @@ const impactoDivergencias = produtos.reduce((acc, produto) => {
   }
 });
 
-  ["A2","A8", "B8", "C8", "D8","A16", "B16", "C16", "D16"].forEach(cell => {
+  ["A8", "B8", "C8", "D8", "A16", "B16", "C16", "D16"].forEach(cell => {
     if (wsResumo[cell]) {
       wsResumo[cell].s = {
         font: { bold: true, color: { rgb: "FFFFFF" } },
