@@ -1763,7 +1763,6 @@ function renderAlertaCompras() {
 
         <ul>
           ${itensCompra
-            .slice(0, 5)
             .map(
               item => `
                 <li>
