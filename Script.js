@@ -2532,6 +2532,25 @@ const impactoDivergencias = produtos.reduce((acc, produto) => {
   { s: { r: 14, c: 0 }, e: { r: 14, c: 3 } } // linha 15
 ];
 
+  wsResumo["!rows"] = [
+  { hpt: 26 }, // linha 1
+  { hpt: 18 }, // linha 2
+  {},
+  {},
+  {},
+  {},
+  { hpt: 22 }, // linha 7
+  { hpt: 18 }, // linha 8
+  {},
+  {},
+  {},
+  {},
+  {},
+  {},
+  { hpt: 22 }, // linha 15
+  { hpt: 18 }  // linha 16
+];
+
   wsResumo["A1"].s = {
     font: { bold: true, sz: 18, color: { rgb: "FFFFFF" } },
     fill: { fgColor: { rgb: "0D2ED3" } },
@@ -2539,8 +2558,15 @@ const impactoDivergencias = produtos.reduce((acc, produto) => {
   };
 
   wsResumo["A2"].s = {
-  font: { bold: true, sz: 12, color: { rgb: "0D2ED3" } },
-  alignment: { horizontal: "center" }
+  font: {
+    bold: true,
+    sz: 12,
+    color: { rgb: "0D2ED3" }
+  },
+  alignment: {
+    horizontal: "center",
+    vertical: "center"
+  }
 };
 
   ["A7", "A15"].forEach(cell => {
