@@ -22,6 +22,8 @@ let chartMovimentacoesInstance = null;
 let editandoMovimentacaoId = null;
 let paginaMovimentacoes = 1;
 const itensPorPaginaMov = 10;
+let paginaCompras = 1;
+const itensPorPaginaCompras = 5;
 
 // ============================================
 // INICIALIZAÇÃO DO SUPABASE
@@ -1723,7 +1725,6 @@ function initAlocacoesPage() {
 
 function renderAlertaCompras() {
   const container = document.getElementById("alertaComprasContainer");
-
   if (!container || !produtos.length) return;
 
   const itensCompra = produtos.filter(
@@ -1742,19 +1743,26 @@ function renderAlertaCompras() {
   let valorReposicao = 0;
 
   itensCompra.forEach(produto => {
-    const comprar =
-      Number(produto.minimo) - Number(produto.quantidade);
-
+    const comprar = Number(produto.minimo) - Number(produto.quantidade);
     valorReposicao += comprar * Number(produto.valor || 0);
   });
+
+  const totalPaginas = Math.ceil(itensCompra.length / itensPorPaginaCompras);
+
+  if (paginaCompras > totalPaginas) {
+    paginaCompras = 1;
+  }
+
+  const inicio = (paginaCompras - 1) * itensPorPaginaCompras;
+  const fim = inicio + itensPorPaginaCompras;
+  const itensPaginados = itensCompra.slice(inicio, fim);
 
   container.innerHTML = `
     <div class="alert-warning compras-alerta">
       <div>
         <h2>🛒 Necessidade de Compras</h2>
-        <p>
-          ${itensCompra.length} equipamento(s) abaixo do estoque mínimo.
-        </p>
+
+        <p>${itensCompra.length} equipamento(s) abaixo do estoque mínimo.</p>
 
         <p>
           <strong>Valor estimado para reposição:</strong>
@@ -1762,33 +1770,41 @@ function renderAlertaCompras() {
         </p>
 
         <ul>
-          ${itensCompra
-            .slice(0, 5)
-            .map(
-              item => `
-                <li>
-                  ${item.nome}
-                  (${item.quantidade}/${item.minimo})
-                </li>
-              `
-            )
-            .join("")}
+          ${itensPaginados.map(item => `
+            <li>
+              ${item.nome}
+              (${item.quantidade}/${item.minimo})
+            </li>
+          `).join("")}
         </ul>
-        ${
-  itensCompra.length > 5
-    ? `
-      <p style="margin-top:10px;">
-        <strong>+ ${itensCompra.length - 5}</strong> item(ns) adicionais aguardando reposição.
-      </p>
-    `
-    : ""
-}
+
+        <div class="pagination compras-pagination">
+          <button
+            class="btn btn-secondary"
+            onclick="mudarPaginaCompras(-1)"
+            ${paginaCompras <= 1 ? "disabled" : ""}
+          >
+            Anterior
+          </button>
+
+          <span>Página ${paginaCompras} de ${totalPaginas}</span>
+
+          <button
+            class="btn btn-secondary"
+            onclick="mudarPaginaCompras(1)"
+            ${paginaCompras >= totalPaginas ? "disabled" : ""}
+          >
+            Próxima
+          </button>
+        </div>
       </div>
     </div>
   `;
 }
-
-
+function mudarPaginaCompras(direcao) {
+  paginaCompras += direcao;
+  renderAlertaCompras();
+}
 // ============================================
 // RELATÓRIOS
 // ============================================
