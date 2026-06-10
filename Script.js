@@ -1742,10 +1742,12 @@ function renderAlertaCompras() {
 
   let valorReposicao = 0;
 
-  itensCompra.forEach(produto => {
-    const comprar = Number(produto.minimo) - Number(produto.quantidade);
-    valorReposicao += comprar * Number(produto.valor || 0);
-  });
+itensCompra.forEach(produto => {
+  const comprar =
+    Number(produto.minimo) - Number(produto.quantidade);
+
+  valorReposicao += comprar * Number(produto.valor || 0);
+});
 
   const totalPaginas = Math.ceil(itensCompra.length / itensPorPaginaCompras);
 
