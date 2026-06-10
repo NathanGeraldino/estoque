@@ -757,3 +757,37 @@ body[data-page="inventario"] .table-wrapper {
   margin-bottom: 20px;
   border-left: 5px solid #22c55e;
 }
+.alert-warning.compras-alerta {
+  background: #ffffff;
+  color: #0f172a;
+  border-left: 6px solid #f59e0b;
+  border-radius: 18px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.alert-warning.compras-alerta h2 {
+  color: #0f172a;
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.alert-warning.compras-alerta p {
+  color: #475569;
+  margin: 6px 0;
+}
+
+.alert-warning.compras-alerta strong {
+  color: #0f172a;
+}
+
+.alert-warning.compras-alerta ul {
+  margin-top: 12px;
+  padding-left: 22px;
+  color: #0f172a;
+}
+
+.alert-warning.compras-alerta li {
+  margin-bottom: 6px;
+}
