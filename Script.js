@@ -1763,6 +1763,7 @@ function renderAlertaCompras() {
 
         <ul>
           ${itensCompra
+            .slice(0, 5)
             .map(
               item => `
                 <li>
@@ -1773,6 +1774,15 @@ function renderAlertaCompras() {
             )
             .join("")}
         </ul>
+        ${
+  itensCompra.length > 5
+    ? `
+      <p style="margin-top:10px;">
+        <strong>+ ${itensCompra.length - 5}</strong> item(ns) adicionais aguardando reposição.
+      </p>
+    `
+    : ""
+}
       </div>
     </div>
   `;
