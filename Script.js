@@ -1779,6 +1779,7 @@ function renderAlertaCompras() {
   `;
 }
 
+
 // ============================================
 // RELATÓRIOS
 // ============================================
@@ -2674,6 +2675,7 @@ function refreshAll() {
   renderRelatorioCategorias();
   renderRelatorioMaiorSaida();
   renderAlertaInventario();
+  renderAlertaCompras();
 }
 function ativarRealtime() {
   if (!supabaseClient) return;
