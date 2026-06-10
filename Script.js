@@ -2322,6 +2322,32 @@ function exportarInventarioExcel() {
   const conformidade = total > 0 ? (ok / total) * 100 : 0;
   const percentualConferido = total > 0 ? (conferidos / total) * 100 : 0;
 
+  const valorTotalEstoque = produtos.reduce(
+    (acc, produto) =>
+      acc + Number(produto.quantidade) * Number(produto.valor || 0),
+    0
+  );
+
+  const valorMedioEquipamento =
+    total > 0 ? valorTotalEstoque / total : 0;
+
+  const estoqueBaixo = produtos.filter(
+    produto => Number(produto.quantidade) <= Number(produto.minimo)
+  ).length;
+
+  const impactoDivergencias = produtos.reduce((acc, produto) => {
+    const registro = obterRegistroInventario(produto.id);
+
+    if (!registro || registro.situacao !== "divergente") {
+      return acc;
+    }
+
+    const diferenca =
+      Number(registro.quantidade_conferida) - Number(produto.quantidade);
+
+    return acc + Math.abs(diferenca) * Number(produto.valor || 0);
+  }, 0);
+
   let situacaoGeral = "Inventário em andamento.";
   if (pendentes === 0 && divergentes === 0) {
     situacaoGeral = "Inventário concluído sem divergências.";
@@ -2340,45 +2366,52 @@ function exportarInventarioExcel() {
     ["Trimestre", obterTrimestreAtual(), "Data de Exportação", new Date().toLocaleString("pt-BR")],
     ["Situação Geral", situacaoGeral, "", ""],
     [],
-    ["INDICADOR", "VALOR", "PERCENTUAL", "OBSERVAÇÃO"],
+    ["RESUMO PATRIMONIAL", "", "", ""],
+    ["Indicador", "Valor", "Percentual", "Observação"],
     ["Total de Equipamentos", total, "100%", "Total cadastrado no sistema"],
+    ["Valor Total do Estoque", formatarMoeda(valorTotalEstoque), "-", "Valor estimado dos itens em estoque"],
+    ["Valor Médio por Equipamento", formatarMoeda(valorMedioEquipamento), "-", "Média patrimonial por item cadastrado"],
+    ["Equipamentos com Estoque Baixo", estoqueBaixo, `${((estoqueBaixo / total) * 100).toFixed(2)}%`, "Itens abaixo ou iguais ao mínimo"],
+    [],
+    ["RESUMO DA CONFERÊNCIA", "", "", ""],
+    ["Indicador", "Valor", "Percentual", "Observação"],
     ["Equipamentos Conferidos", conferidos, `${percentualConferido.toFixed(2)}%`, "Itens já verificados fisicamente"],
     ["Pendências de Conferência", pendentes, `${((pendentes / total) * 100).toFixed(2)}%`, "Itens ainda não conferidos"],
     ["Divergências Encontradas", divergentes, `${((divergentes / total) * 100).toFixed(2)}%`, "Diferença entre sistema e físico"],
     ["Itens em Conformidade", ok, `${conformidade.toFixed(2)}%`, "Itens conferidos sem divergência"],
-    ["Índice de Conformidade", `${conformidade.toFixed(2)}%`, "", "Percentual geral de conformidade"]
+    ["Índice de Conformidade", `${conformidade.toFixed(2)}%`, "-", "Percentual geral de conformidade"],
+    ["Impacto Financeiro das Divergências", formatarMoeda(impactoDivergencias), "-", "Valor estimado das divergências encontradas"]
   ];
 
   const wsResumo = XLSX.utils.aoa_to_sheet(resumo);
 
   wsResumo["!cols"] = [
-    { wch: 34 },
-    { wch: 22 },
+    { wch: 38 },
+    { wch: 28 },
     { wch: 18 },
-    { wch: 45 }
+    { wch: 48 }
   ];
 
   wsResumo["!merges"] = [
     { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } },
     { s: { r: 1, c: 0 }, e: { r: 1, c: 3 } },
-    { s: { r: 4, c: 1 }, e: { r: 4, c: 3 } }
+    { s: { r: 4, c: 1 }, e: { r: 4, c: 3 } },
+    { s: { r: 6, c: 0 }, e: { r: 6, c: 3 } },
+    { s: { r: 13, c: 0 }, e: { r: 13, c: 3 } }
   ];
 
-  // Título principal
   wsResumo["A1"].s = {
     font: { bold: true, sz: 18, color: { rgb: "FFFFFF" } },
     fill: { fgColor: { rgb: "0D2ED3" } },
     alignment: { horizontal: "center", vertical: "center" }
   };
 
-  // Subtítulo
   wsResumo["A2"].s = {
     font: { bold: true, sz: 12, color: { rgb: "0D2ED3" } },
     alignment: { horizontal: "center" }
   };
 
-  // Linha de cabeçalho dos indicadores
-  ["A7", "B7", "C7", "D7"].forEach(cell => {
+  ["A7", "A14"].forEach(cell => {
     if (wsResumo[cell]) {
       wsResumo[cell].s = {
         font: { bold: true, color: { rgb: "FFFFFF" } },
@@ -2388,16 +2421,27 @@ function exportarInventarioExcel() {
     }
   });
 
-  // Estilo das linhas de indicadores
-  for (let i = 8; i <= 13; i++) {
+  ["A8", "B8", "C8", "D8", "A15", "B15", "C15", "D15"].forEach(cell => {
+    if (wsResumo[cell]) {
+      wsResumo[cell].s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "0D2ED3" } },
+        alignment: { horizontal: "center" }
+      };
+    }
+  });
+
+  for (let i = 9; i <= 21; i++) {
     ["A", "B", "C", "D"].forEach(col => {
       const cell = `${col}${i}`;
 
       if (wsResumo[cell]) {
         wsResumo[cell].s = {
           font: { bold: col === "A" || col === "B" },
-          fill: { fgColor: { rgb: i % 2 === 0 ? "F3F6FB" : "FFFFFF" } },
-          alignment: { horizontal: col === "B" || col === "C" ? "center" : "left" },
+          fill: { fgColor: { rgb: i % 2 === 0 ? "FFFFFF" : "F3F6FB" } },
+          alignment: {
+            horizontal: col === "B" || col === "C" ? "center" : "left"
+          },
           border: {
             top: { style: "thin", color: { rgb: "D9E2EF" } },
             bottom: { style: "thin", color: { rgb: "D9E2EF" } }
