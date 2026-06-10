@@ -2548,7 +2548,7 @@ const impactoDivergencias = produtos.reduce((acc, produto) => {
     }
   });
 
-  for (let i = 9; i <= 21; i++) {
+  for (let i = 9; i <= 25; i++) {
     ["A", "B", "C", "D"].forEach(col => {
       const cell = `${col}${i}`;
 
