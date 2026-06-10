@@ -2528,7 +2528,7 @@ const impactoDivergencias = produtos.reduce((acc, produto) => {
     alignment: { horizontal: "center" }
   };
 
-  ["A7", "A14"].forEach(cell => {
+  ["A7", "A15"].forEach(cell => {
     if (wsResumo[cell]) {
       wsResumo[cell].s = {
         font: { bold: true, color: { rgb: "FFFFFF" } },
@@ -2548,7 +2548,7 @@ const impactoDivergencias = produtos.reduce((acc, produto) => {
     }
   });
 
-  for (let i = 9; i <= 25; i++) {
+  for (let i = 9; i <= resumo.length; i++) {
     ["A", "B", "C", "D"].forEach(col => {
       const cell = `${col}${i}`;
 
