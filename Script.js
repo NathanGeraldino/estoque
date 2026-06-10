@@ -1721,6 +1721,64 @@ function initAlocacoesPage() {
   renderHistoricoAlocacoes();
 }
 
+function renderAlertaCompras() {
+  const container = document.getElementById("alertaComprasContainer");
+
+  if (!container || !produtos.length) return;
+
+  const itensCompra = produtos.filter(
+    produto => Number(produto.quantidade) <= Number(produto.minimo)
+  );
+
+  if (!itensCompra.length) {
+    container.innerHTML = `
+      <div class="alert-success">
+        ✅ Todos os equipamentos estão acima do estoque mínimo.
+      </div>
+    `;
+    return;
+  }
+
+  let valorReposicao = 0;
+
+  itensCompra.forEach(produto => {
+    const comprar =
+      Number(produto.minimo) - Number(produto.quantidade);
+
+    valorReposicao += comprar * Number(produto.valor || 0);
+  });
+
+  container.innerHTML = `
+    <div class="alert-warning compras-alerta">
+      <div>
+        <h2>🛒 Necessidade de Compras</h2>
+        <p>
+          ${itensCompra.length} equipamento(s) abaixo do estoque mínimo.
+        </p>
+
+        <p>
+          <strong>Valor estimado para reposição:</strong>
+          ${formatarMoeda(valorReposicao)}
+        </p>
+
+        <ul>
+          ${itensCompra
+            .slice(0, 5)
+            .map(
+              item => `
+                <li>
+                  ${item.nome}
+                  (${item.quantidade}/${item.minimo})
+                </li>
+              `
+            )
+            .join("")}
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
 // ============================================
 // RELATÓRIOS
 // ============================================
