@@ -1727,9 +1727,21 @@ function renderAlertaCompras() {
   const container = document.getElementById("alertaComprasContainer");
   if (!container || !produtos.length) return;
 
-const itensCompra = produtos.filter(
-  p => Number(p.quantidade) < Number(p.minimo)
-);
+const ordemPrioridade = {
+  "Crítica": 1,
+  "Alta": 2,
+  "Média": 3,
+  "Baixa": 4
+};
+
+const itensCompra = produtos
+  .filter(p => Number(p.quantidade) < Number(p.minimo))
+  .sort((a, b) => {
+    return (
+      (ordemPrioridade[a.prioridade] || 99) -
+      (ordemPrioridade[b.prioridade] || 99)
+    );
+  });
 
   if (!itensCompra.length) {
     container.innerHTML = `
