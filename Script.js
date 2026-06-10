@@ -2301,7 +2301,6 @@ async function initInventarioPage() {
 }
 
 function exportarInventarioExcel() {
-
   if (!produtos.length) {
     mostrarMensagem("Nenhum equipamento encontrado", "warning");
     return;
@@ -2310,8 +2309,7 @@ function exportarInventarioExcel() {
   const total = produtos.length;
 
   const conferidos = inventarioTrimestral.filter(
-    item => item.situacao === "ok" ||
-            item.situacao === "divergente"
+    item => item.situacao === "ok" || item.situacao === "divergente"
   ).length;
 
   const divergentes = inventarioTrimestral.filter(
@@ -2319,105 +2317,102 @@ function exportarInventarioExcel() {
   ).length;
 
   const pendentes = total - conferidos;
+  const ok = conferidos - divergentes;
 
-  const conformidade = total > 0
-    ? ((conferidos - divergentes) / total) * 100
-    : 0;
+  const conformidade = total > 0 ? (ok / total) * 100 : 0;
+  const percentualConferido = total > 0 ? (conferidos / total) * 100 : 0;
+
+  let situacaoGeral = "Inventário em andamento.";
+  if (pendentes === 0 && divergentes === 0) {
+    situacaoGeral = "Inventário concluído sem divergências.";
+  } else if (pendentes === 0 && divergentes > 0) {
+    situacaoGeral = "Inventário concluído com divergências.";
+  } else if (pendentes > 0) {
+    situacaoGeral = "Inventário ainda possui equipamentos pendentes de conferência.";
+  }
 
   const wb = XLSX.utils.book_new();
 
-  // ==========================================
-  // RESUMO EXECUTIVO
-  // ==========================================
-
   const resumo = [
-    ["RELATÓRIO DE INVENTÁRIO TRIMESTRAL"],
+    ["CLIOMED - CONTROLE TRIMESTRAL DE EQUIPAMENTOS", "", "", ""],
+    ["Relatório executivo de inventário", "", "", ""],
     [],
-    ["Trimestre", obterTrimestreAtual()],
-    ["Data de Exportação", new Date().toLocaleString("pt-BR")],
+    ["Trimestre", obterTrimestreAtual(), "Data de Exportação", new Date().toLocaleString("pt-BR")],
+    ["Situação Geral", situacaoGeral, "", ""],
     [],
-    ["INDICADOR", "VALOR"],
-    ["Total de Equipamentos", total],
-    ["Conferidos", conferidos],
-    ["Pendentes", pendentes],
-    ["Divergentes", divergentes],
-    ["Conformidade", `${conformidade.toFixed(2)}%`]
+    ["INDICADOR", "VALOR", "PERCENTUAL", "OBSERVAÇÃO"],
+    ["Total de Equipamentos", total, "100%", "Total cadastrado no sistema"],
+    ["Equipamentos Conferidos", conferidos, `${percentualConferido.toFixed(2)}%`, "Itens já verificados fisicamente"],
+    ["Pendências de Conferência", pendentes, `${((pendentes / total) * 100).toFixed(2)}%`, "Itens ainda não conferidos"],
+    ["Divergências Encontradas", divergentes, `${((divergentes / total) * 100).toFixed(2)}%`, "Diferença entre sistema e físico"],
+    ["Itens em Conformidade", ok, `${conformidade.toFixed(2)}%`, "Itens conferidos sem divergência"],
+    ["Índice de Conformidade", `${conformidade.toFixed(2)}%`, "", "Percentual geral de conformidade"]
   ];
 
   const wsResumo = XLSX.utils.aoa_to_sheet(resumo);
 
-wsResumo["!cols"] = [
-  { wch: 38 },
-  { wch: 22 }
-];
+  wsResumo["!cols"] = [
+    { wch: 34 },
+    { wch: 22 },
+    { wch: 18 },
+    { wch: 45 }
+  ];
 
-wsResumo["!merges"] = [
-  { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }
-];
+  wsResumo["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 3 } },
+    { s: { r: 4, c: 1 }, e: { r: 4, c: 3 } }
+  ];
 
-wsResumo["A1"].s = {
-  font: { bold: true, sz: 16, color: { rgb: "FFFFFF" } },
-  fill: { fgColor: { rgb: "0D2ED3" } },
-  alignment: { horizontal: "center", vertical: "center" }
-};
+  // Título principal
+  wsResumo["A1"].s = {
+    font: { bold: true, sz: 18, color: { rgb: "FFFFFF" } },
+    fill: { fgColor: { rgb: "0D2ED3" } },
+    alignment: { horizontal: "center", vertical: "center" }
+  };
 
-wsResumo["A6"].s = {
-  font: { bold: true, color: { rgb: "FFFFFF" } },
-  fill: { fgColor: { rgb: "0D2ED3" } },
-  alignment: { horizontal: "center" }
-};
+  // Subtítulo
+  wsResumo["A2"].s = {
+    font: { bold: true, sz: 12, color: { rgb: "0D2ED3" } },
+    alignment: { horizontal: "center" }
+  };
 
-wsResumo["B6"].s = {
-  font: { bold: true, color: { rgb: "FFFFFF" } },
-  fill: { fgColor: { rgb: "0D2ED3" } },
-  alignment: { horizontal: "center" }
-};
+  // Linha de cabeçalho dos indicadores
+  ["A7", "B7", "C7", "D7"].forEach(cell => {
+    if (wsResumo[cell]) {
+      wsResumo[cell].s = {
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+        fill: { fgColor: { rgb: "0D2ED3" } },
+        alignment: { horizontal: "center" }
+      };
+    }
+  });
 
-for (let i = 7; i <= 11; i++) {
-  const cellA = `A${i}`;
-  const cellB = `B${i}`;
+  // Estilo das linhas de indicadores
+  for (let i = 8; i <= 13; i++) {
+    ["A", "B", "C", "D"].forEach(col => {
+      const cell = `${col}${i}`;
 
-  if (wsResumo[cellA]) {
-    wsResumo[cellA].s = {
-      font: { bold: true },
-      fill: { fgColor: { rgb: "F3F6FB" } },
-      border: {
-        bottom: { style: "thin", color: { rgb: "D9E2EF" } }
+      if (wsResumo[cell]) {
+        wsResumo[cell].s = {
+          font: { bold: col === "A" || col === "B" },
+          fill: { fgColor: { rgb: i % 2 === 0 ? "F3F6FB" : "FFFFFF" } },
+          alignment: { horizontal: col === "B" || col === "C" ? "center" : "left" },
+          border: {
+            top: { style: "thin", color: { rgb: "D9E2EF" } },
+            bottom: { style: "thin", color: { rgb: "D9E2EF" } }
+          }
+        };
       }
-    };
+    });
   }
-
-  if (wsResumo[cellB]) {
-    wsResumo[cellB].s = {
-      font: { bold: true },
-      alignment: { horizontal: "center" },
-      fill: { fgColor: { rgb: "FFFFFF" } },
-      border: {
-        bottom: { style: "thin", color: { rgb: "D9E2EF" } }
-      }
-    };
-  }
-}
-
-  // ==========================================
-  // INVENTÁRIO COMPLETO
-  // ==========================================
 
   const dados = produtos.map((produto) => {
+    const registro = obterRegistroInventario(produto.id);
 
-    const registro =
-      obterRegistroInventario(produto.id);
-
-    const qtdSistema =
-      Number(produto.quantidade);
-
-    const qtdConferida =
-      registro?.quantidade_conferida ?? "-";
-
-    const diferenca =
-      registro
-        ? Number(qtdConferida) - qtdSistema
-        : "-";
+    const qtdSistema = Number(produto.quantidade);
+    const qtdConferida = registro?.quantidade_conferida ?? "-";
+    const diferenca = registro ? Number(qtdConferida) - qtdSistema : "-";
 
     return {
       ID: produto.id,
@@ -2426,24 +2421,18 @@ for (let i = 7; i <= 11; i++) {
       "Qtd Sistema": qtdSistema,
       "Qtd Conferida": qtdConferida,
       Diferença: diferenca,
-
       Status:
         registro?.situacao === "ok"
           ? "OK"
           : registro?.situacao === "divergente"
           ? "DIVERGENTE"
           : "PENDENTE",
-
-      Responsável:
-        registro?.responsavel || "-",
-
-      Observação:
-        registro?.observacao || "-"
+      Responsável: registro?.responsavel || "-",
+      Observação: registro?.observacao || "-"
     };
   });
 
-  const wsInventario =
-    XLSX.utils.json_to_sheet(dados);
+  const wsInventario = XLSX.utils.json_to_sheet(dados);
 
   wsInventario["!cols"] = [
     { wch: 8 },
@@ -2457,51 +2446,15 @@ for (let i = 7; i <= 11; i++) {
     { wch: 45 }
   ];
 
-  // ==========================================
-  // ESTILIZAÇÃO BÁSICA
-  // ==========================================
-
-  // Título
-  wsResumo["A1"].s = {
-    font: {
-      bold: true,
-      sz: 16
-    }
-  };
-
-  // Cabeçalhos
-  ["A6", "B6"].forEach(cell => {
-    if (wsResumo[cell]) {
-      wsResumo[cell].s = {
-        font: { bold: true }
-      };
-    }
-  });
-
-  // ==========================================
-  // ADICIONA ABAS
-  // ==========================================
-
-  XLSX.utils.book_append_sheet(
-    wb,
-    wsResumo,
-    "Resumo Executivo"
-  );
-
-  XLSX.utils.book_append_sheet(
-    wb,
-    wsInventario,
-    "Inventário Completo"
-  );
+  XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo Executivo");
+  XLSX.utils.book_append_sheet(wb, wsInventario, "Inventário Completo");
 
   XLSX.writeFile(
     wb,
     `Relatorio_Inventario_${obterTrimestreAtual()}.xlsx`
   );
 
-  mostrarMensagem(
-    "Relatório executivo exportado!"
-  );
+  mostrarMensagem("Relatório executivo exportado!");
 }
 // ============================================
 // REFRESH E INICIALIZAÇÃO
