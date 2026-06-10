@@ -1743,10 +1743,15 @@ function renderAlertaCompras() {
   let valorReposicao = 0;
 
 itensCompra.forEach(produto => {
-  const comprar =
-    Number(produto.minimo) - Number(produto.quantidade);
+  const quantidadeAtual = Number(produto.quantidade);
+  const estoqueMinimo = Number(produto.minimo);
+  const valorUnitario = Number(produto.valor || 0);
 
-  valorReposicao += comprar * Number(produto.valor || 0);
+  const comprar = estoqueMinimo - quantidadeAtual;
+
+  if (comprar > 0) {
+    valorReposicao += comprar * valorUnitario;
+  }
 });
 
   const totalPaginas = Math.ceil(itensCompra.length / itensPorPaginaCompras);
