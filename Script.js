@@ -2413,31 +2413,56 @@ function exportarInventarioExcel() {
   const conformidade = total > 0 ? (ok / total) * 100 : 0;
   const percentualConferido = total > 0 ? (conferidos / total) * 100 : 0;
 
-  const valorTotalEstoque = produtos.reduce(
-    (acc, produto) =>
-      acc + Number(produto.quantidade) * Number(produto.valor || 0),
-    0
+  const totalEquipamentos = produtos.length;
+
+const totalEstoque = produtos.reduce(
+  (total, p) => total + Number(p.quantidade || 0),
+  0
+);
+
+const valorTotalEstoque = produtos.reduce(
+  (total, p) =>
+    total + Number(p.quantidade || 0) * Number(p.valor || p.preco || 0),
+  0
+);
+
+const valorMedioEquipamento =
+  totalEquipamentos > 0
+    ? valorTotalEstoque / totalEquipamentos
+    : 0;
+
+const itensCompra = produtos.filter(
+  p => Number(p.quantidade || 0) < Number(p.minimo || p.quantidade_minima || 0)
+);
+
+const estoqueBaixo = itensCompra.length;
+
+let valorReposicao = 0;
+
+itensCompra.forEach(p => {
+  const minimo = Number(p.minimo || p.quantidade_minima || 0);
+  const quantidade = Number(p.quantidade || 0);
+  const valor = Number(p.valor || p.preco || 0);
+
+  valorReposicao += (minimo - quantidade) * valor;
+});
+
+const impactoDivergencias = produtos.reduce((acc, produto) => {
+  const registro = obterRegistroInventario(produto.id);
+
+  if (!registro || registro.situacao !== "divergente") {
+    return acc;
+  }
+
+  const diferenca =
+    Number(registro.quantidade_conferida) - Number(produto.quantidade);
+
+  return (
+    acc +
+    Math.abs(diferenca) *
+      Number(produto.valor || produto.preco || 0)
   );
-
-  const valorMedioEquipamento =
-    total > 0 ? valorTotalEstoque / total : 0;
-
-  const estoqueBaixo = produtos.filter(
-    produto => Number(produto.quantidade) <= Number(produto.minimo)
-  ).length;
-
-  const impactoDivergencias = produtos.reduce((acc, produto) => {
-    const registro = obterRegistroInventario(produto.id);
-
-    if (!registro || registro.situacao !== "divergente") {
-      return acc;
-    }
-
-    const diferenca =
-      Number(registro.quantidade_conferida) - Number(produto.quantidade);
-
-    return acc + Math.abs(diferenca) * Number(produto.valor || 0);
-  }, 0);
+}, 0);
 
   let situacaoGeral = "Inventário em andamento.";
   if (pendentes === 0 && divergentes === 0) {
@@ -2462,7 +2487,8 @@ function exportarInventarioExcel() {
     ["Total de Equipamentos", total, "100%", "Total cadastrado no sistema"],
     ["Valor Total do Estoque", formatarMoeda(valorTotalEstoque), "-", "Valor estimado dos itens em estoque"],
     ["Valor Médio por Equipamento", formatarMoeda(valorMedioEquipamento), "-", "Média patrimonial por item cadastrado"],
-    ["Equipamentos com Estoque Baixo", estoqueBaixo, `${((estoqueBaixo / total) * 100).toFixed(2)}%`, "Itens abaixo ou iguais ao mínimo"],
+    ["Equipamentos abaixo do mínimo", estoqueBaixo, `${((estoqueBaixo / total) * 100).toFixed(2)}%`, "Itens que precisam de reposição"],
+    ["Investimento para reposição", formatarMoeda(valorReposicao), "-", "Valor necessário para atingir o estoque mínimo"],
     [],
     ["RESUMO DA CONFERÊNCIA", "", "", ""],
     ["Indicador", "Valor", "Percentual", "Observação"],
