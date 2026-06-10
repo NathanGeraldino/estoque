@@ -832,6 +832,7 @@ function editarProduto(id) {
   const quantidade = document.getElementById("quantidade");
   const minimo = document.getElementById("minimo");
   const valor = document.getElementById("valor");
+  const prioridade = document.getElementById("prioridade");
   const formTitle = document.getElementById("formTitle");
   const btnSalvarProduto = document.getElementById("btnSalvarProduto");
   const modoEdicaoProduto = document.getElementById("modoEdicaoProduto");
@@ -847,6 +848,7 @@ function editarProduto(id) {
   quantidade.value = item.quantidade ?? "";
   minimo.value = item.minimo ?? 5;
   valor.value = item.valor ?? "";
+  if (prioridade) prioridade.value = item.prioridade || "Média";
   formTitle.textContent = "Editar equipamento";
 
   if (btnSalvarProduto) btnSalvarProduto.textContent = "Salvar edição";
@@ -912,6 +914,7 @@ function initProdutosPage() {
     const quantidade = Number(document.getElementById("quantidade").value);
     const minimo = Number(document.getElementById("minimo").value);
     const valor = Number(document.getElementById("valor").value);
+    const prioridade = document.getElementById("prioridade")?.value || "Média";
 
     if (!nome) {
       alert("Informe o equipamento.");
@@ -927,14 +930,14 @@ if (editandoId) {
 
 
     const produto = {
-      id: editandoId || null,
-      nome,
-      modelo,
-      quantidade,
-      minimo,
-      valor
-    };
-
+    id: editandoId || null,
+    nome,
+    modelo,
+    quantidade,
+    minimo,
+    valor,
+    prioridade
+  };
     const resultado = await salvarProduto(produto);
 
     if (resultado) {
