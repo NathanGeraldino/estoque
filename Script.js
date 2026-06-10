@@ -61,6 +61,7 @@ async function carregarDados() {
       minimo: p.quantidade_minima,
       valor: p.preco,
       descricao: p.descricao
+      prioridade: p.prioridade || "Média"
     }));
 
     // Carrega movimentações
@@ -103,12 +104,12 @@ async function salvarProduto(produto) {
     quantidade: produto.quantidade,
     quantidade_minima: produto.minimo,
     preco: produto.valor,
-    descricao: produto.descricao || ''
+    descricao: produto.descricao || '',
+    prioridade: produto.prioridade || 'Média'
   };
 
   try {
     if (produto.id && !String(produto.id).includes('-')) {
-      // Atualizar existente
       const { data, error } = await supabaseClient
         .from('equipamentos')
         .update({ ...dadosSupabase, updated_at: new Date().toISOString() })
@@ -119,7 +120,6 @@ async function salvarProduto(produto) {
       if (error) throw error;
       return data;
     } else {
-      // Criar novo
       const { data, error } = await supabaseClient
         .from('equipamentos')
         .insert([dadosSupabase])
