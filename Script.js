@@ -2532,82 +2532,82 @@ const impactoDivergencias = produtos.reduce((acc, produto) => {
   { s: { r: 14, c: 0 }, e: { r: 14, c: 3 } } // linha 15
 ];
 
-  wsResumo["!rows"] = [
-  { hpt: 26 }, // linha 1
-  { hpt: 18 }, // linha 2
+wsResumo["!rows"] = [
+  { hpt: 26 },
+  { hpt: 20 },
   {},
   {},
   {},
   {},
-  { hpt: 22 }, // linha 7
-  { hpt: 18 }, // linha 8
+  { hpt: 22 },
+  { hpt: 20 },
   {},
   {},
   {},
   {},
   {},
   {},
-  { hpt: 22 }, // linha 15
-  { hpt: 18 }  // linha 16
+  { hpt: 22 },
+  { hpt: 20 }
 ];
 
-  wsResumo["A1"].s = {
-    font: { bold: true, sz: 18, color: { rgb: "FFFFFF" } },
+// Linha 1
+wsResumo["A1"].s = {
+  font: { bold: true, sz: 18, color: { rgb: "FFFFFF" } },
+  fill: { fgColor: { rgb: "0D2ED3" } },
+  alignment: { horizontal: "center", vertical: "center" }
+};
+
+// Linha 2
+wsResumo["A2"].s = {
+  font: { bold: true, sz: 14, color: { rgb: "0D2ED3" } },
+  fill: { fgColor: { rgb: "EEF4FF" } },
+  alignment: { horizontal: "center", vertical: "center" }
+};
+
+// Barras azuis linhas 7 e 15
+["A7", "A15"].forEach(cell => {
+  wsResumo[cell].s = {
+    font: { bold: true, sz: 12, color: { rgb: "FFFFFF" } },
     fill: { fgColor: { rgb: "0D2ED3" } },
     alignment: { horizontal: "center", vertical: "center" }
   };
+});
 
-  wsResumo["A2"].s = {
-  font: {
-    bold: true,
-    sz: 12,
-    color: { rgb: "0D2ED3" }
-  },
-  alignment: {
-    horizontal: "center",
-    vertical: "center"
-  }
-};
-
-  ["A7", "A15"].forEach(cell => {
+// Cabeçalhos linhas 8 e 16
+["A8", "B8", "C8", "D8", "A16", "B16", "C16", "D16"].forEach(cell => {
   if (wsResumo[cell]) {
     wsResumo[cell].s = {
-      font: { bold: true, color: { rgb: "FFFFFF" } },
-      fill: { fgColor: { rgb: "0D2ED3" } },
-      alignment: { horizontal: "center" }
+      font: { bold: true, sz: 14, color: { rgb: "0D2ED3" } },
+      fill: { fgColor: { rgb: "EEF4FF" } },
+      alignment: { horizontal: "center", vertical: "center" }
     };
   }
 });
 
-  ["A8", "B8", "C8", "D8", "A16", "B16", "C16", "D16"].forEach(cell => {
+// Linhas de dados
+for (let i = 9; i <= resumo.length; i++) {
+  if (i === 15 || i === 16) continue;
+
+  ["A", "B", "C", "D"].forEach(col => {
+    const cell = `${col}${i}`;
+
     if (wsResumo[cell]) {
       wsResumo[cell].s = {
-        font: { bold: true, color: { rgb: "FFFFFF" } },
-        fill: { fgColor: { rgb: "0D2ED3" } },
-        alignment: { horizontal: "center" }
+        font: { bold: col === "A" || col === "B" },
+        fill: { fgColor: { rgb: i % 2 === 0 ? "FFFFFF" : "F3F6FB" } },
+        alignment: {
+          horizontal: col === "B" || col === "C" ? "center" : "left",
+          vertical: "center"
+        },
+        border: {
+          top: { style: "thin", color: { rgb: "D9E2EF" } },
+          bottom: { style: "thin", color: { rgb: "D9E2EF" } }
+        }
       };
     }
   });
-  
-  for (let i = 9; i <= resumo.length; i++) {
-    ["A", "B", "C", "D"].forEach(col => {
-      const cell = `${col}${i}`;
-
-      if (wsResumo[cell]) {
-        wsResumo[cell].s = {
-          font: { bold: col === "A" || col === "B" },
-          fill: { fgColor: { rgb: i % 2 === 0 ? "FFFFFF" : "F3F6FB" } },
-          alignment: {
-            horizontal: col === "B" || col === "C" ? "center" : "left"
-          },
-          border: {
-            top: { style: "thin", color: { rgb: "D9E2EF" } },
-            bottom: { style: "thin", color: { rgb: "D9E2EF" } }
-          }
-        };
-      }
-    });
-  }
+}
 
   const dados = produtos.map((produto) => {
     const registro = obterRegistroInventario(produto.id);
